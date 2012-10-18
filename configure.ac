@@ -3,8 +3,8 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ(2.63)
 
 AC_INIT([JW],[1.0.0],[dominik.wabersich@gmail.com],[JAGS-WIENER-MODULE])
-JW_MAJOR=4
-JW_MINOR=0
+JAGS_MAJOR=4
+JAGS_MINOR=0
 AC_SUBST(JW_MAJOR)
 AC_SUBST(JW_MINOR)
 

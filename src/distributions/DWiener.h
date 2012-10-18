@@ -26,7 +26,13 @@
 #ifndef DWIENER_H_
 #define DWIENER_H_
 
+#include <config.h>
 #include <distribution/ScalarDist.h>
+#include <JRmath.h>
+
+#define JWML_WIENER_ERR 1e-10
+#define JWML_NAN (0.0 / 0.0)
+#define JWML_NEGINF ((-1.0) / 0.0)
 
 namespace wiener {
 

@@ -1,4 +1,4 @@
-SUBDIRS = distributions jwmath 
+SUBDIRS = distributions
 
 jagsmod_LTLIBRARIES = wiener.la
 
@@ -7,7 +7,6 @@ wiener_la_SOURCES = wiener.cc
 wiener_la_CPPFLAGS = -I$(includedir)/JAGS
 
 wiener_la_LIBADD = distributions/wienerdist.la \
-        					 jwmath/libjwmath.la \
         					 $(libdir)/libjags.la \
         					 $(libdir)/libjrmath.la \
         					 @LAPACK_LIBS@ @BLAS_LIBS@ 
