@@ -1,15 +1,15 @@
 dnl Process this file with autoconf to produce a configure script.
 
-AC_PREREQ(2.63)
+AC_PREREQ([2.68])
 
-AC_INIT([JW],[1.0.0],[dominik.wabersich@gmail.com],[JAGS-WIENER-MODULE])
+AC_INIT([JAGS-WIENER],[0.1],[dominik.wabersich@gmail.com],[JAGS-WIENER-MODULE])
 JAGS_MAJOR=4
 JAGS_MINOR=0
 AC_SUBST(JW_MAJOR)
 AC_SUBST(JW_MINOR)
 
 AC_CANONICAL_HOST
-AC_CONFIG_SRCDIR([src])
+AC_CONFIG_SRCDIR([src/distributions/DWiener.cc])
 AC_CONFIG_MACRO_DIR([m4])
 AC_CONFIG_HEADERS([config.h])
 AM_INIT_AUTOMAKE
@@ -20,11 +20,8 @@ LT_CONFIG_LTDL_DIR([libltdl])
 LT_INIT([dlopen disable-static win32-dll])
 LTDL_INIT([recursive])
 
-AC_PROG_CC
+dnl C++
 AC_PROG_CXX
-AC_PROG_F77
-AM_PROG_LEX
-AC_PROG_YACC
 
 dnl IEEE 754 arithmetic
 AC_CHECK_HEADERS(ieeefp.h)
@@ -95,6 +92,5 @@ AC_CONFIG_FILES([
   libltdl/Makefile
   src/Makefile
   src/distributions/Makefile	
-  src/jwmath/Makefile	
 ])
 AC_OUTPUT

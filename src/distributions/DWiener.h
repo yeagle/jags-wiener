@@ -59,8 +59,6 @@ class DWiener : public ScalarDist
     double randomSample(std::vector<double const *> const &parameters,
 	   	double const *lower, double const *upper,
 	   	RNG *rng) const;
-    double calPlower(double, std::vector<double const *> const &) const;
-    double calPupper(double, std::vector<double const *> const &) const;
     double typicalValue(std::vector<double const *> const &parameters,
 	   	double const *lower, double const *upper) const;
     /**
