@@ -20,6 +20,9 @@
  *
  */
 
+// to resolve unnecessary R lib dependencies
+#define MATHLIB_STANDALONE
+
 #include <JRmath.h>
 
 #define JWML_WIENER_ERR 1e-10

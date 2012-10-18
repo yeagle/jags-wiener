@@ -1,7 +1,7 @@
 noinst_LTLIBRARIES = wienerdist.la
 
 wienerdist_la_CPPFLAGS = -I.. \
-												 -I$(top_srcdir)/src/include
+												 -I$(includedir)/JAGS
 
 wienerdist_la_LDFLAGS = -no-undefined -module -avoid-version
 
