@@ -3,10 +3,7 @@
 
 #include <rng/RNG.h>
 #include <util/nainf.h>
-#include <util/dim.h>
-
 #include <cmath>
-#include <algorithm>
 
 #include <jwmath/jwmath.h>
 

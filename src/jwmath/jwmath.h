@@ -21,17 +21,17 @@
  */
 
 // to resolve unnecessary R lib dependencies
-#define MATHLIB_STANDALONE
-
+#include <config.h>
 #include <JRmath.h>
+
+// to resolve unnecessary R lib dependencies
+#define MATHLIB_STANDALONE
 
 #define JWML_WIENER_ERR 1e-10
 #define JWML_NAN (0.0 / 0.0)
 #define JWML_NEGINF ((-1.0) / 0.0)
 
-double maxOfNum(double, double);
 double dwiener(double, double, double, double, double, int);
 double pwiener(double, double, double, double, double, int, int);
 double qwiener(double, double, double, double, double, int, int);
 double rwiener(double, double, double, double, RNG*);
-
