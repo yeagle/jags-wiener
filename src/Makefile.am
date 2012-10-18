@@ -7,9 +7,10 @@ wiener_la_SOURCES = wiener.cc
 wiener_la_CPPFLAGS = -I$(includedir)/JAGS
 
 wiener_la_LIBADD = distributions/wienerdist.la \
-        jwmath/libjwmath.la	\
-        $(libdir)/libjags.la \
-        @LAPACK_LIBS@ @BLAS_LIBS@ 
+        					 jwmath/libjwmath.la \
+        					 $(libdir)/libjags.la \
+        					 $(libdir)/libjrmath.la \
+        					 @LAPACK_LIBS@ @BLAS_LIBS@ 
 
 wiener_la_LDFLAGS = -module -avoid-version
 if WINDOWS
