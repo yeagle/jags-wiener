@@ -3,7 +3,7 @@ dnl Process this file with autoconf to produce a configure script.
 AC_PREREQ([2.68])
 
 AC_INIT([JAGS-WIENER],[0.1],[dominik.wabersich@gmail.com],[JAGS-WIENER-MODULE])
-JAGS_MAJOR=4
+JAGS_MAJOR=3
 JAGS_MINOR=0
 AC_SUBST(JW_MAJOR)
 AC_SUBST(JW_MINOR)
@@ -41,9 +41,6 @@ case "${host_os}" in
 esac
 AM_CONDITIONAL(WINDOWS, test x$win = xtrue)
 
-dnl fortran stuff
-AC_F77_WRAPPERS
-AC_F77_LIBRARY_LDFLAGS
 ACX_LAPACK([],[
 	AC_MSG_ERROR("You need to install the LAPACK library")
 ])
