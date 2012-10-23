@@ -5,8 +5,8 @@ AC_PREREQ([2.68])
 AC_INIT([JAGS-WIENER],[0.1],[dominik.wabersich@gmail.com],[JAGS-WIENER-MODULE])
 JAGS_MAJOR=3
 JAGS_MINOR=0
-AC_SUBST(JW_MAJOR)
-AC_SUBST(JW_MINOR)
+AC_SUBST(JAGS_MAJOR)
+AC_SUBST(JAGS_MINOR)
 
 AC_CANONICAL_HOST
 AC_CONFIG_SRCDIR([src/distributions/DWiener.cc])
@@ -89,5 +89,6 @@ AC_CONFIG_FILES([
   libltdl/Makefile
   src/Makefile
   src/distributions/Makefile	
+  win/Makefile
 ])
 AC_OUTPUT
