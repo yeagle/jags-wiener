@@ -5,7 +5,8 @@
 #include <util/nainf.h>
 #include <cmath>
 
-using std::string;
+#include <JRmath.h>
+
 using std::vector;
 using std::log;
 using std::min;
