@@ -6,7 +6,7 @@ wiener process.
 EXAMPLE
 In a model file, you can use:
 
-x ~ dwiwner(a,ter,w,v)
+x ~ dwiener(a,ter,w,v)
  
 With the parameters a,ter,w,v:
   - a being the boundary separation parameter
