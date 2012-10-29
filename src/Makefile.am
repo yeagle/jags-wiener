@@ -7,9 +7,7 @@ wiener_la_SOURCES = wiener.cc
 wiener_la_CPPFLAGS = -I$(includedir)/JAGS
 
 wiener_la_LIBADD = distributions/wienerdist.la \
-									 -ljags \
-									 @LAPACK_LIBS@ @BLAS_LIBS@ 
-
+									 -ljags
 
 wiener_la_LDFLAGS = -module -avoid-version
 if WINDOWS
