@@ -1,7 +1,8 @@
 JAGS WIENER MODULE
-This is a JAGS Module, which provides wiener functions. These can be used,
-in the model definition, to include nodes, which are distributed as a
-wiener process.
+The JAGS Wiener module is an extension for JAGS, which provides wiener
+process distribution functions, mainly the Wiener first passage time
+density. It allows to include stochastic nodes with the first hitting time
+distribution of a diffusion process.
 
 EXAMPLE
 In a model file, you can use:

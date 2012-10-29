@@ -29,9 +29,11 @@
 #include <config.h>
 #include <distribution/ScalarDist.h>
 
-#define JWML_WIENER_ERR 1e-10
-#define JWML_NAN (0.0 / 0.0)
-#define JWML_NEGINF ((-1.0) / 0.0)
+#define WIENER_ERR 1e-10
+
+#ifndef M_LN_SQRT_PI
+#define M_LN_SQRT_PI	0.572364942924700087071713675677	/* log(sqrt(pi)) */
+#endif
 
 namespace wiener {
 

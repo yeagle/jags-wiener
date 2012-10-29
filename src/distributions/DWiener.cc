@@ -5,8 +5,6 @@
 #include <util/nainf.h>
 #include <cmath>
 
-#include <JRmath.h>
-
 using std::vector;
 using std::log;
 using std::min;
@@ -136,11 +134,11 @@ double DWiener::d(double x, PDFType type,
   //int acc; // accuracy - true if response was correct 
 
 #ifdef IEEE_754
-  if (ISNAN(x) || ISNAN(v) || ISNAN(BOUND(par)) || ISNAN(w) || ISNAN(TER(par)))
+  if (jags_isnan(x) || jags_isnan(v) || jags_isnan(BOUND(par)) || jags_isnan(w) || jags_isnan(TER(par)))
     return x + v + BOUND(par) + w + TER(par);
 #endif
-  if (!R_FINITE(x) || !R_FINITE(BOUND(par))) return (give_log ? JWML_NEGINF : 0);
-  if (w < 0 || w > 1 || BOUND(par) <= 0 || TER(par) <= 0) return JWML_NAN;
+  if (!jags_finite(x) || !jags_finite(BOUND(par))) return (give_log ? JAGS_NEGINF : 0);
+  if (w < 0 || w > 1 || BOUND(par) <= 0 || TER(par) <= 0) return JAGS_NAN;
 
   // extract RT and accuracy from x
   if (x<0) {
@@ -157,16 +155,16 @@ double DWiener::d(double x, PDFType type,
   x = x/pow(BOUND(par),2); // convert t to normalized time tt
 
   // calculate number of terms needed for large t
-  if (M_PI*x*JWML_WIENER_ERR<1) { // if error threshold is set low enough
-      kl=sqrt(-2*log(M_PI*x*JWML_WIENER_ERR)/(pow(M_PI,2)*x)); // bound
+  if (M_PI*x*WIENER_ERR<1) { // if error threshold is set low enough
+      kl=sqrt(-2*log(M_PI*x*WIENER_ERR)/(pow(M_PI,2)*x)); // bound
       kl=(kl>1/(M_PI*sqrt(x))) ? kl : 1/(M_PI*sqrt(x)); // ensure boundary conditions met
   }
   else { // if error threshold set too high
       kl=1/(M_PI*sqrt(x)); // set to boundary condition
   }
   // calculate number of terms needed for small t
-  if ((2*sqrt(2*M_PI*x)*JWML_WIENER_ERR)<1) { // if error threshold is set low enough
-      ks=2+sqrt(-2*x*log(2*sqrt(2*M_PI*x)*JWML_WIENER_ERR)); // bound
+  if ((2*sqrt(2*M_PI*x)*WIENER_ERR)<1) { // if error threshold is set low enough
+      ks=2+sqrt(-2*x*log(2*sqrt(2*M_PI*x)*WIENER_ERR)); // bound
       ks=(ks>sqrt(x)+1) ? ks : sqrt(x)+1; // ensure boundary conditions are met
   }
   else { // if error threshold was set too high
@@ -200,20 +198,20 @@ double DWiener::p(double q, vector<double const *> const &par, bool lower,
     bool give_log) const
 {
   // TODO
-  return JWML_NAN;
+  return JAGS_NAN;
 }
 
 double DWiener::q(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const
 {
   // TODO
-  return JWML_NAN;
+  return JAGS_NAN;
 }
 
 double DWiener::r(vector<double const *> const &par, RNG *rng) const
 {
   // TODO
-  return JWML_NAN;
+  return JAGS_NAN;
 }
 
 }
