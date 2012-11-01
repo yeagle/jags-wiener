@@ -7,13 +7,13 @@ distribution of a diffusion process.
 EXAMPLE
 In a model file, you can use:
 
-x ~ dwiener(a,ter,w,v)
+x ~ dwiener(alpha,tau,beta,delta)
  
-With the parameters a,ter,w,v:
-  - a being the boundary separation parameter
-  - ter being the non-decision time
-  - w being the bias
-  - v being the driftrate
+With the parameters:
+  - alpha being the boundary separation parameter
+  - tau being the non-decision time
+  - beta being the bias
+  - delta being the driftrate
 
 PLEASE NOTE
 Copyright (C) 2012 Dominik Wabersich <dominik.wabersich@gmail.com>

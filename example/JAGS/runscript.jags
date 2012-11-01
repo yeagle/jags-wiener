@@ -2,7 +2,7 @@
 load wiener
 
 # Initialize model with 3 chains
-model in "easy_model.txt"
+model in "../easy_model.txt"
 data in "easytask_data.txt"
 compile, nchains(3) 
 parameters in "inits1.txt"
