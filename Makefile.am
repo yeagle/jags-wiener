@@ -3,6 +3,9 @@ SUBDIRS = m4 libltdl src win
 
 .PHONY: win32-install win64-install installer docs
 
+example-zip:
+	(zip -r example example)
+
 win32-install:
 	make prefix=`pwd`/win/inst32
 	make install prefix=`pwd`/win/inst32
