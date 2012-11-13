@@ -12,7 +12,7 @@ using std::max;
 
 #define BOUND(par) (*par[0])
 #define TER(par) (*par[1])
-#define RELST(par) (*par[2])
+#define BIAS(par) (*par[2])
 #define DRIFT(par) (*par[3])
 
 namespace wiener {
@@ -64,6 +64,7 @@ double DWiener::randomSample(vector<double const *> const &parameters,
 			  double const *lower, double const *upper,
 			  RNG *rng) const
 {
+  /*
   if (lower || upper) {
     double plower = 0, pupper = 1;
     if (lower) {
@@ -78,6 +79,8 @@ double DWiener::randomSample(vector<double const *> const &parameters,
   else {
     return r(parameters, rng);
   }
+  */
+  return r(parameters, rng);
 
 }
 
@@ -121,14 +124,14 @@ double DWiener::typicalValue(vector<double const *> const &parameters,
 bool DWiener::checkParameterValue (vector<double const *> const &par) const
 {
     return (BOUND(par)>0 && 
-            RELST(par)<1 && RELST(par)>0 &&
+            BIAS(par)<1 && BIAS(par)>0 &&
             TER(par) > 0);
 }
 
 double DWiener::d(double x, PDFType type, 
          vector<double const *> const &par, bool give_log) const
 {
-  double v=DRIFT(par), w=RELST(par);
+  double v=DRIFT(par), w=BIAS(par);
   double kl, ks, ans;
   int k,K;
   //int acc; // accuracy - true if response was correct 
@@ -205,13 +208,98 @@ double DWiener::q(double p, vector<double const *> const &par, bool lower,
     bool log_p) const
 {
   // TODO
-  return JAGS_NAN;
+  if(p == 0.5) return 1;
+  else return JAGS_NAN;
 }
 
 double DWiener::r(vector<double const *> const &par, RNG *rng) const
 {
-  // TODO
-  return JAGS_NAN;
+  double t=0;
+  vector<double > tmp_pars(2,0);
+  tmp_pars[0] = *par[0];
+  tmp_pars[1] = *par[3];
+  if(BIAS(par) == 0.5) {
+    t = r_symmetric(tmp_pars,rng);
+  }
+  else {
+    double tmp_t,a,z= BIAS(par)*BOUND(par);
+    bool bound_hit=false;
+    while (!bound_hit) {
+      // near upper bound
+      if (z/BOUND(par) > .5) {
+        a = (BOUND(par)-z)*2;
+        tmp_pars[0] = a;
+        tmp_t = r_symmetric(tmp_pars,rng);
+        t += std::abs(tmp_t);
+        if(tmp_t < 0) {
+          bound_hit = true;
+          t = -t;
+        }
+        else z=BOUND(par)-a;
+      }
+      // near lower bound
+      else if (z/BOUND(par) < .5) {
+        a = z*2;
+        tmp_pars[0] = a;
+        tmp_t = r_symmetric(tmp_pars,rng);
+        t += std::abs(tmp_t);
+        if(tmp_t < 0) z = z*2;
+        else bound_hit=true;
+      }
+      // symmetric (in the middle of both bounds)
+      else {
+        a = (BOUND(par)-z)*2;
+        tmp_pars[0] = a;
+        tmp_t = r_symmetric(tmp_pars,rng);
+        t += std::abs(tmp_t);
+        if(tmp_t < 0) {
+          bound_hit = true;
+          t = -t;
+        }
+        else bound_hit = true;
+      }
+    } // end while
+  }
+  if (t >= 0) return t+TER(par);
+  else return t-TER(par);
+}
+
+double DWiener::r_symmetric(vector<double> par, RNG *rng) const
+{
+  // Rejection based algorithm - see Tuerlinckx et. al (2001) 
+  double u,t,crit;
+  bool converged=false;
+  double mu = par[1]; 
+  double sigma = 1;
+  double a = par[0];
+  double lambda = pow(mu,2)/(2*pow(sigma,2)) + (pow(M_PI,2)*pow(sigma,2))/(2*pow(a,2));
+  double M = ( (M_PI*pow(sigma,2))/pow(a,2) 
+      * ( exp((a*mu)/(2*pow(sigma,2))) + exp((-a*mu)/(2*pow(sigma,2))) ) ) 
+      / (pow(mu,2)/(2*pow(sigma,2)) + (pow(M_PI,2)*pow(sigma,2))/(2*pow(a,2)));
+  double F = (pow(M_PI,2)*pow(sigma,4)) / (pow(M_PI,2)*pow(sigma,4)+pow(mu,2)*pow(a,2));
+  double infinite_sum, infinite_sum_o1=0, infinite_sum_o2=0;
+
+  do {
+    u = rng->uniform();
+    t = -1/lambda * std::abs(log(1-u));
+    converged = false;
+    infinite_sum=0;
+    for (int n=1;!converged;n++) {
+      infinite_sum_o2 = infinite_sum_o1;
+      infinite_sum_o1 = infinite_sum;
+      infinite_sum += (2*n+1)*pow(-1,n)*pow(1-u,F*pow(2*n+1,2));
+      /* stop approximation of ininite_sum,
+       * when the difference to the (n-1) sum and the (n-2) sum is below
+       * WIENER_ERR. As proposed by Tuerlinckx (2004). */
+      if (n>2 && (infinite_sum-infinite_sum_o1) < WIENER_ERR && (infinite_sum-infinite_sum_o2) < WIENER_ERR) converged=true;
+      else if (n>10000) break; // break for-loop if it does not converge
+    }
+    if(converged) crit = 1 + pow((1-u),F) * infinite_sum;
+    else crit = 1; // if not converged, try a different value.
+  } while((rng->uniform())>crit); // take the t, if within target distribution
+
+  if (((rng->normal()+mu)*sigma)>=0) return -t; // hit the upper bound
+  else return t; // hit the lower bound
 }
 
 }

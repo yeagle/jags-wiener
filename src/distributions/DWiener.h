@@ -78,6 +78,7 @@ class DWiener : public ScalarDist
     double q(double p, std::vector<double const *> const &parameters, bool lower,
 	    bool log_p) const;
     double r(std::vector<double const *> const &parameters, RNG *rng) const;
+    double r_symmetric(std::vector<double> par, RNG *rng) const;
 };
 
 }
