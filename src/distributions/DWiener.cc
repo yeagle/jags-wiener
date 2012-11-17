@@ -214,12 +214,31 @@ double DWiener::q(double p, vector<double const *> const &par, bool lower,
 
 double DWiener::r(vector<double const *> const &par, RNG *rng) const
 {
+  r_random_walk(par,rng); // if dt is to small, it won't work!
+}
+
+double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, double dt) const
+{
+  double t,sigma=1;
+	unsigned int i = 0;
+	double y = BIAS(par)*BOUND(par);
+	while(y < BOUND(par) && y > 0) {
+		y = y + sqrt(dt) * (sigma*rng->normal()+DRIFT(par));
+		i+=1;
+	}
+  if(y >= BOUND(par)) t = -(i*dt+TER(par));
+  else t = i*dt+TER(par);
+	return t;
+}
+
+double DWiener::r_rejection_based(vector<double const *> const &par, RNG *rng) const
+{
   double t=0;
   vector<double > tmp_pars(2,0);
   tmp_pars[0] = *par[0];
   tmp_pars[1] = *par[3];
   if(BIAS(par) == 0.5) {
-    t = r_symmetric(tmp_pars,rng);
+    t = r_rejection_based_symmetric(tmp_pars,rng);
   }
   else {
     double tmp_t,a,z= BIAS(par)*BOUND(par);
@@ -229,7 +248,7 @@ double DWiener::r(vector<double const *> const &par, RNG *rng) const
       if (z/BOUND(par) > .5) {
         a = (BOUND(par)-z)*2;
         tmp_pars[0] = a;
-        tmp_t = r_symmetric(tmp_pars,rng);
+        tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
         t += std::abs(tmp_t);
         if(tmp_t < 0) {
           bound_hit = true;
@@ -241,7 +260,7 @@ double DWiener::r(vector<double const *> const &par, RNG *rng) const
       else if (z/BOUND(par) < .5) {
         a = z*2;
         tmp_pars[0] = a;
-        tmp_t = r_symmetric(tmp_pars,rng);
+        tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
         t += std::abs(tmp_t);
         if(tmp_t < 0) z = z*2;
         else bound_hit=true;
@@ -250,7 +269,7 @@ double DWiener::r(vector<double const *> const &par, RNG *rng) const
       else {
         a = (BOUND(par)-z)*2;
         tmp_pars[0] = a;
-        tmp_t = r_symmetric(tmp_pars,rng);
+        tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
         t += std::abs(tmp_t);
         if(tmp_t < 0) {
           bound_hit = true;
@@ -260,13 +279,14 @@ double DWiener::r(vector<double const *> const &par, RNG *rng) const
       }
     } // end while
   }
-  if (t >= 0) return t+TER(par);
-  else return t-TER(par);
+  if (t >= 0)  t = (t+TER(par));
+  else t = (t-TER(par));
+  return t;
 }
 
-double DWiener::r_symmetric(vector<double> par, RNG *rng) const
+double DWiener::r_rejection_based_symmetric(vector<double> par, RNG *rng) const
 {
-  // Rejection based algorithm - see Tuerlinckx et. al (2001) 
+  // Rejection based algorithm - see Tuerlinckx et al. (2001) 
   double u,t,crit;
   bool converged=false;
   double mu = par[1]; 
@@ -291,11 +311,11 @@ double DWiener::r_symmetric(vector<double> par, RNG *rng) const
       /* stop approximation of ininite_sum,
        * when the difference to the (n-1) sum and the (n-2) sum is below
        * WIENER_ERR. As proposed by Tuerlinckx (2004). */
-      if (n>2 && (infinite_sum-infinite_sum_o1) < WIENER_ERR && (infinite_sum-infinite_sum_o2) < WIENER_ERR) converged=true;
+      if (n>2 && std::abs(infinite_sum-infinite_sum_o1) < WIENER_ERR && std::abs(infinite_sum-infinite_sum_o2) < WIENER_ERR) converged=true;
       else if (n>10000) break; // break for-loop if it does not converge
     }
     if(converged) crit = 1 + pow((1-u),F) * infinite_sum;
-    else crit = 1; // if not converged, try a different value.
+    else crit = 0; // if not converged, try a different value.
   } while((rng->uniform())>crit); // take the t, if within target distribution
 
   if (((rng->normal()+mu)*sigma)>=0) return -t; // hit the upper bound
