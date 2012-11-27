@@ -5,7 +5,6 @@
 #include <util/nainf.h>
 #include <cmath>
 #include <JRmath.h>
-#include <iostream>
 
 using std::vector;
 using std::log;
@@ -104,6 +103,7 @@ double DWiener::typicalValue(vector<double const *> const &parameters,
   
   double pmed = (plower + pupper)/2;
   double med = q(pmed, parameters, true, false);	
+  if (jags_isnan(med)) med = 1; // quickfix
 
   //Calculate the log densities
   double dllimit = d(llimit, PDF_FULL, parameters, true);
@@ -203,16 +203,17 @@ double DWiener::p(double q, vector<double const *> const &par, bool lower,
     bool give_log) const
 {
   double p;
+  if (jags_isnan(q)) return JAGS_NAN;
   if (q < 0) { // lower boundary 0
-    p = -F_lower(q-TER(par), DRIFT(par), BOUND(par), BIAS(par));
+    p = -F_lower(fabs(q)-TER(par), DRIFT(par), BOUND(par), BIAS(par));
     if (!lower) p = -(0.5-fabs(p));
   }
   else { // upper boundary a
-    p = F_lower(fabs(q)-TER(par), (-DRIFT(par)), BOUND(par), (1-BIAS(par)));
+    p = F_lower(q-TER(par), (-DRIFT(par)), BOUND(par), (1-BIAS(par)));
     if (!lower) p = 0.5-p;
   }
   // TODO: Make calculations more efficient by using give_log
-  if (give_log) return log(p);
+  if (give_log) return p>0?log(p):-log(abs(p));
   else return p;
 }
 
@@ -306,24 +307,25 @@ double DWiener::q(double p, vector<double const *> const &par, bool lower,
   double q=1;
   double p_tmp;
   unsigned int iterations = 0;
-  if (p>0.5 || p<-0.5) return JAGS_NAN;
-  do {
-    p_tmp = this->p(q, par, lower, log_p);
-    if      (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
-    else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
-    else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
-    else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
-    else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
-    else p_tmp = p;
+  if (p > 1 || p < -1) return JAGS_NAN;
+  if (p<0) q = -1;
+    do {
+      p_tmp = this->p(q, par, lower, log_p);
+      if      (fabs(p_tmp-p) > 1) p-p_tmp>0?q+=1:q-=1;
+      else if (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
+      else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
+      else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
+      else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
+      else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
+      else p_tmp = p;
 
-    if (q <= TER(par)) q = TER(par)+0.0001;
-    iterations++;
-    if (iterations>= 10000) {
-      if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
-      break;
-    }
-  } while(fabs(p_tmp-p) > 0.00001);
-  std::cout << iterations << "\n";
+      if (q <= TER(par)) q = TER(par)+0.0001;
+      iterations++;
+      if (iterations>= 10000) {
+        if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
+        break;
+      }
+    } while(fabs(p_tmp-p) > 0.00001);
   return q;
 }
 
