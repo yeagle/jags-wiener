@@ -4,6 +4,8 @@
 #include <rng/RNG.h>
 #include <util/nainf.h>
 #include <cmath>
+#include <JRmath.h>
+#include <iostream>
 
 using std::vector;
 using std::log;
@@ -200,23 +202,159 @@ double DWiener::d(double x, PDFType type,
 double DWiener::p(double q, vector<double const *> const &par, bool lower, 
     bool give_log) const
 {
-  // TODO
-  return JAGS_NAN;
+  double p;
+  if (q < 0) { // lower boundary 0
+    p = -F_lower(q-TER(par), DRIFT(par), BOUND(par), BIAS(par));
+    if (!lower) p = -(0.5-fabs(p));
+  }
+  else { // upper boundary a
+    p = F_lower(fabs(q)-TER(par), (-DRIFT(par)), BOUND(par), (1-BIAS(par)));
+    if (!lower) p = 0.5-p;
+  }
+  // TODO: Make calculations more efficient by using give_log
+  if (give_log) return log(p);
+  else return p;
+}
+
+double DWiener::sign(double v) const {
+  if (v == 0) return 0;
+  else if (v>0) return 1;
+  else if (v<0) return -1;
+}
+
+double DWiener::F_lower(double q, double v, double a, double w) const
+{
+  /*  double sigma = 1;
+      a = a / sigma;
+      v = v / sigma; */
+  double F;
+  int K_l = K_large(q, v, a, w);
+  int K_s = K_small(q, v, a, w);
+  if (K_l < 10*K_s) F = Fl_lower(q, v, a, w, K_l);
+  else F = Fs_lower(q, v, a, w, K_s);
+  return F;
+}
+
+double DWiener::Fl_lower(double q, double v, double a, double w, int K) const
+{
+  double F=0;
+  for(int k=K; k>=1; k--) F = F - k / (v*v*1.0 + k*k*M_PI*M_PI/(a*1.0)/a) * exp(-v*a*w*1.0 - 0.5*v*v*q - 0.5*k*k*M_PI*M_PI/(a*1.0)/a*q) * sin(M_PI*k*w);
+  return prob_upperbound(v, a, w) + 2.0*M_PI/(a*1.0)/a * F;
+}
+
+double DWiener::Fs_lower(double q, double v, double a, double w, int K) const
+{
+  if (v == 0) return(Fs0_lower(q, a, w, K));
+  double S1=0,S2=0;
+  double sqt = sqrt(q);
+  for(int k=K; k>=1; k--) {
+    S1 = S1 + exp_pnorm(2*v*a*k, -sign(v)*(2*a*k+a*w+v*q)/sqt) -
+           exp_pnorm(-2*v*a*k - 2*v*a*w, sign(v)*(2*a*k+a*w-v*q)/sqt);
+    S2 = S2 + exp_pnorm(-2*v*a*k, sign(v)*(2*a*k-a*w-v*q)/sqt) -
+           exp_pnorm(2*v*a*k - 2*v*a*w, -sign(v)*(2*a*k-a*w+v*q)/sqt);
+  }
+  return prob_upperbound(v, a, w) + sign(v) * ((pnorm(-sign(v) * (a*w+v*q)/sqt,0,1,1,0) -
+           exp_pnorm(-2*v*a*w, sign(v) * (a*w-v*q)/sqt)) + S1 + S2);
+}
+
+double DWiener::Fs0_lower(double q, double a, double w, int K) const
+{
+  double F=0;
+  for(int k=K; k>=0; k--) {
+    F = F - pnorm((-2*k - 2 + w)*a/sqrt(q),0,1,1,0) + pnorm((-2*k - w)*a/sqrt(q),0,1,1,0);
+  }
+
+  return 2*F;
+}
+
+double DWiener::prob_upperbound(double v, double a, double w) const
+{
+  double e = exp(-2.0 * v * a * (1.0-w));
+  if(e == JAGS_POSINF) return 1;
+  else if(fabs(e - 1) < 0) return (1-w);
+  else return ((1 - e) / (exp(2.0*v*a*w) - e));
+}
+
+double DWiener::exp_pnorm(double a, double b) const
+{
+  double r;
+  if (jags_isnan(r) && b < -5.5) r = 1/sqrt(2) * exp(a - b*b/2) * (0.5641882/b/b/b - 1/b/sqrt(M_PI));
+  else r = exp(a) * pnorm(b,0,1,1,0);
+  return r;
+}
+
+int DWiener::K_large(double q, double v, double a, double w)  const
+{
+  double sqrtL1 = sqrt(1/q) * a/M_PI;
+  double sqrtL2 = sqrt(max(1.0, -2/q*a*a/M_PI/M_PI * (log(WIENER_ERR*M_PI*q/2 * (v*v + M_PI*M_PI/a/a)) + v*a*w + v*v*q/2)));
+  return ceil(max(sqrtL1, sqrtL2));
+}
+
+int DWiener::K_small(double q, double v, double a, double w, double epsilon)  const
+{
+  if(v == 0) return ceil(max(0.0, w/2 - sqrt(q)/2/a * qnorm(max(0.0, min(1.0, epsilon/(2-2*w))),0,1,1,0)));
+  if(v > 0) return(K_small(q, -v, a, w, exp(-2*a*w*v)*epsilon));
+  double S2 = w - 1 + 0.5/v/a * log(epsilon/2 * (1-exp(2*v*a)));
+  double S3 = (0.535 * sqrt(2*q) + v*q + a*w)/2/a;
+  double S4 = w/2 - sqrt(q)/2/a * qnorm(max(0.0, min(1.0, epsilon * a / 0.3 / sqrt(2*M_PI*q) * exp(v*v*q/2 + v*a*w))),0,1,1,0);
+  return ceil(max(max(max(S2, S3), S4), 0.0));
 }
 
 double DWiener::q(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const
 {
-  // TODO
-  if(p == 0.5) return 1;
-  else return JAGS_NAN;
+  double q=1;
+  double p_tmp;
+  unsigned int iterations = 0;
+  if (p>0.5 || p<-0.5) return JAGS_NAN;
+  do {
+    p_tmp = this->p(q, par, lower, log_p);
+    if      (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
+    else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
+    else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
+    else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
+    else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
+    else p_tmp = p;
+
+    if (q <= TER(par)) q = TER(par)+0.0001;
+    iterations++;
+    if (iterations>= 10000) {
+      if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
+      break;
+    }
+  } while(fabs(p_tmp-p) > 0.00001);
+  std::cout << iterations << "\n";
+  return q;
 }
 
 double DWiener::r(vector<double const *> const &par, RNG *rng) const
 {
-  r_random_walk(par,rng); // if dt is to small, it won't work!
+  //return r_rejection_based(par,rng);
+  //return r_random_walk(par,rng); // if dt is to small, it won't work!
+  return r_rejection_based_2(BOUND(par), TER(par), BOUND(par)*BIAS(par), DRIFT(par),rng);
 }
 
+/*
+double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, double dt) const
+{
+  double t,sigma=1;
+  double p = .5 * (1+((DRIFT(par)*sqrt(dt))/sigma));
+  //double q = .5 * (1-((mu*sqrt(dt))/sigma));
+	int i = 0;
+	double y = BIAS(par)*BOUND(par);
+	while(y < BOUND(par) && y > 0)
+	{
+    if(rng->uniform() <= p) y = y + sigma*sqrt(dt);
+    else y = y - sigma*sqrt(dt);
+		i++;
+	}
+  if(y >= BOUND(par)) t = (i*dt+TER(par));
+  else t = -(i*dt+TER(par));
+	return t;
+
+}
+
+// NOTE: this random walk does not work!
 double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, double dt) const
 {
   double t,sigma=1;
@@ -231,6 +369,7 @@ double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, doubl
 	return t;
 }
 
+// TODO: Need to find error in this function...
 double DWiener::r_rejection_based(vector<double const *> const &par, RNG *rng) const
 {
   double t=0;
@@ -249,7 +388,7 @@ double DWiener::r_rejection_based(vector<double const *> const &par, RNG *rng) c
         a = (BOUND(par)-z)*2;
         tmp_pars[0] = a;
         tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
-        t += std::abs(tmp_t);
+        t += fabs(tmp_t);
         if(tmp_t < 0) {
           bound_hit = true;
           t = -t;
@@ -261,7 +400,7 @@ double DWiener::r_rejection_based(vector<double const *> const &par, RNG *rng) c
         a = z*2;
         tmp_pars[0] = a;
         tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
-        t += std::abs(tmp_t);
+        t += fabs(tmp_t);
         if(tmp_t < 0) z = z*2;
         else bound_hit=true;
       }
@@ -270,7 +409,7 @@ double DWiener::r_rejection_based(vector<double const *> const &par, RNG *rng) c
         a = (BOUND(par)-z)*2;
         tmp_pars[0] = a;
         tmp_t = r_rejection_based_symmetric(tmp_pars,rng);
-        t += std::abs(tmp_t);
+        t += fabs(tmp_t);
         if(tmp_t < 0) {
           bound_hit = true;
           t = -t;
@@ -301,17 +440,17 @@ double DWiener::r_rejection_based_symmetric(vector<double> par, RNG *rng) const
 
   do {
     u = rng->uniform();
-    t = -1/lambda * std::abs(log(1-u));
+    t = -1/lambda * fabs(log(1-u));
     converged = false;
     infinite_sum=0;
     for (int n=1;!converged;n++) {
       infinite_sum_o2 = infinite_sum_o1;
       infinite_sum_o1 = infinite_sum;
       infinite_sum += (2*n+1)*pow(-1,n)*pow(1-u,F*pow(2*n+1,2));
-      /* stop approximation of ininite_sum,
-       * when the difference to the (n-1) sum and the (n-2) sum is below
-       * WIENER_ERR. As proposed by Tuerlinckx (2004). */
-      if (n>2 && std::abs(infinite_sum-infinite_sum_o1) < WIENER_ERR && std::abs(infinite_sum-infinite_sum_o2) < WIENER_ERR) converged=true;
+      // stop approximation of ininite_sum,
+      // when the difference to the (n-1) sum and the (n-2) sum is below
+      // WIENER_ERR. As proposed by Tuerlinckx (2004).
+      if (n>2 && fabs(infinite_sum-infinite_sum_o1) < WIENER_ERR && fabs(infinite_sum-infinite_sum_o2) < WIENER_ERR) converged=true;
       else if (n>10000) break; // break for-loop if it does not converge
     }
     if(converged) crit = 1 + pow((1-u),F) * infinite_sum;
@@ -320,6 +459,94 @@ double DWiener::r_rejection_based_symmetric(vector<double> par, RNG *rng) const
 
   if (((rng->normal()+mu)*sigma)>=0) return -t; // hit the upper bound
   else return t; // hit the lower bound
+}
+*/
+
+double DWiener::r_rejection_based_2(double a, double ter, double z, double v, RNG *rng) const
+{
+  /*  mere copy of wdmrnd.cpp by JV, only changes:
+   *  - return value double instead of void
+   *  - removed *t and *x, instead returning t or -t 
+   *  - added variable t (double)
+   *  - replaced GNU gsl with JAGS rng
+   *  - absol replaced with fabs
+   *  - amin replaced with min
+   *  - pi replaced with M_PI
+   */
+  double dt=1e-15,tau=.1,D=.005,totaltime,startpos,ndrt,
+  zz,Aupper,Alower,radius,lambda,F,prob,tt,dir_,l,s1,s2,tnew,t_delta;
+  int uu,i;
+  bool finish;
+  double t;
+  
+  a/=10;
+  z/=10;
+  v/=10;
+
+  finish = false;
+  totaltime=0;
+  startpos=0;
+  Aupper=a-z;
+  Alower=-z;
+  radius=min(fabs(Aupper),fabs(Alower));
+  
+  while (!finish) {
+    if (v==0){
+      lambda = 0.25*D*M_PI*M_PI/(radius*radius);
+      F=1;
+      prob = .5;
+    } 
+    else {
+      lambda = 0.25*v*v/D + 0.25*D*M_PI*M_PI/(radius*radius);
+      F=D*M_PI/(radius*v);
+      F=F*F/(1+F*F);
+      prob=exp(radius*v/D);
+      prob=prob/(1+prob);
+    }
+    dir_= rng->uniform()<prob ? 1 : -1;
+    l=-1;
+    s2=0;
+    
+    while (s2>l) {
+      s2 = rng->uniform();
+      s1 = rng->uniform();
+      tnew=0;
+      t_delta=0;
+      uu=0;
+      
+      while ( (fabs(t_delta)>dt) | (!uu) ) {
+        tt = 2*++uu+1;
+        t_delta = tt * (uu%2?-1:1) * pow(s1,(F*tt*tt));
+        tnew += t_delta;
+      }
+      
+      l = 1 + pow(s1,-F) * tnew;
+    }/*end while (s2>l) */
+    
+    totaltime+=fabs(log(s1))/lambda;
+    dir_=startpos+dir_*radius;
+    
+    if (dir_+dt>Aupper) {
+      //*t=totaltime+ter;
+      //*x=1;
+      t = totaltime+ter;
+      finish=true;
+      return t;
+    }
+    else {
+      if (dir_-dt<Alower) {
+        //*t=totaltime+ter;
+        //*x=0;
+        t = -(totaltime+ter);
+        finish=true;
+        return t; 
+      }
+      else {
+        startpos=dir_;
+        radius=min(fabs(Aupper-startpos),fabs(Alower-startpos));
+      }
+    }
+  } /*end while (!finish) */
 }
 
 }

@@ -73,14 +73,26 @@ class DWiener : public ScalarDist
     double d(double x, PDFType type,
       std::vector<double const *> const &parameters,
       bool give_log) const;
+
     double p(double q, std::vector<double const *> const &parameters, bool lower,
 	    bool give_log) const;
+    double sign(double v) const;
+    double F_lower(double q, double v, double a, double w) const;
+    double Fl_lower(double q, double v, double a, double w, int K) const;
+    double Fs_lower(double q, double v, double a, double w, int K) const;
+    double Fs0_lower(double q, double a, double w, int K) const;
+    double prob_upperbound(double v, double a, double w) const;
+    double exp_pnorm(double a, double b) const;
+    int K_small(double q, double v, double a, double w, double epsilon=WIENER_ERR) const;
+    int K_large(double q, double v, double a, double w) const;
+
     double q(double p, std::vector<double const *> const &parameters, bool lower,
 	    bool log_p) const;
     double r(std::vector<double const *> const &parameters, RNG *rng) const;
-    double r_random_walk(std::vector<double const *> const &parameters, RNG *rng, double dt=0.0001) const;
-    double r_rejection_based(std::vector<double const *> const &parameters, RNG *rng) const;
-    double r_rejection_based_symmetric(std::vector<double> par, RNG *rng) const;
+    //double r_random_walk(std::vector<double const *> const &parameters, RNG *rng, double dt=0.0001) const;
+    //double r_rejection_based(std::vector<double const *> const &parameters, RNG *rng) const;
+    //double r_rejection_based_symmetric(std::vector<double> par, RNG *rng) const;
+    double r_rejection_based_2(double a, double ter, double z, double v, RNG *rng) const;
 };
 
 }

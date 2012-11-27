@@ -23,6 +23,9 @@ LTDL_INIT([recursive])
 dnl C++
 AC_PROG_CXX
 
+dnl Rmath stuff
+AC_DEFINE(MATHLIB_STANDALONE, 1, [Define if you have standalone R math library])
+
 case "${host_os}" in
   mingw*)
     win=true ;;
