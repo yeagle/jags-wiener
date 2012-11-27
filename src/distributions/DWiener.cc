@@ -62,26 +62,22 @@ double DWiener::logDensity(double x, PDFType type,
 
 
 double DWiener::randomSample(vector<double const *> const &parameters,
-			  double const *lower, double const *upper,
-			  RNG *rng) const
+			  double const *lower, double const *upper, RNG *rng) const
 {
-  /*
   if (lower || upper) {
     double plower = 0, pupper = 1;
     if (lower) {
-        plower = p(*lower, parameters, true, false);
+        plower = p_full(*lower, parameters, true, false);
     }
     if (upper) {
-        pupper = p(*upper, parameters, true, false);
+        pupper = p_full(*upper, parameters, true, false);
     }
     double u = plower + rng->uniform() * (pupper - plower);
-    return q(u, parameters, true, false);
+    return q_full(u, parameters, true, false);
   }
   else {
     return r(parameters, rng);
   }
-  */
-  return r(parameters, rng);
 
 }
 
@@ -93,17 +89,16 @@ double DWiener::typicalValue(vector<double const *> const &parameters,
   
   if (lower) {
     llimit = max(llimit, *lower);
-    plower = p(llimit, parameters, true, false);
+    plower = p_full(llimit, parameters, true, false);
   }
 
   if (upper) {
     ulimit = min(ulimit, *upper);
-    pupper = p(ulimit, parameters, true, false);
+    pupper = p_full(ulimit, parameters, true, false);
   }
   
   double pmed = (plower + pupper)/2;
-  double med = q(pmed, parameters, true, false);	
-  if (jags_isnan(med)) med = 1; // quickfix
+  double med = q_full(pmed, parameters, true, false);	
 
   //Calculate the log densities
   double dllimit = d(llimit, PDF_FULL, parameters, true);
@@ -116,10 +111,10 @@ double DWiener::typicalValue(vector<double const *> const &parameters,
     return med;
   }
   else if (dulimit > dllimit) {
-    return q(0.1 * plower + 0.9 * pupper, parameters, true, false);
+    return q_full(0.1 * plower + 0.9 * pupper, parameters, true, false);
   }
   else {
-    return q(0.9 * plower + 0.1 * pupper, parameters, true, false);
+    return q_full(0.9 * plower + 0.1 * pupper, parameters, true, false);
   }
 }
 
@@ -197,6 +192,14 @@ double DWiener::d(double x, PDFType type,
   return give_log ? 
     ans+((-v*BOUND(par)*w -(pow(v,2))*(x*pow(BOUND(par),2))/2)-log(pow(BOUND(par),2))) : 
     ans*exp(-v*BOUND(par)*w -(pow(v,2))*(x*pow(BOUND(par),2))/2)/(pow(BOUND(par),2));
+}
+
+/* This function takes a quantil and returns the full probability
+ * of hitting any of the two boundaries */
+double DWiener::p_full(double q, vector<double const *> const &par, bool lower, 
+    bool give_log) const
+{
+  return (p(q,par,lower,give_log) + p(-q,par,lower,give_log));
 }
 
 double DWiener::p(double q, vector<double const *> const &par, bool lower, 
@@ -301,6 +304,34 @@ int DWiener::K_small(double q, double v, double a, double w, double epsilon)  co
   return ceil(max(max(max(S2, S3), S4), 0.0));
 }
 
+/* This function takes the full probability of hitting any boundary
+ * and returns the appropriate quantile */
+double DWiener::q_full(double p, vector<double const *> const &par, bool lower, 
+    bool log_p) const
+{
+  double q=1;
+  double p_tmp;
+  unsigned int iterations = 0;
+  if (p > 1) return JAGS_NAN;
+    do {
+      p_tmp = this->p_full(q, par, lower, log_p);
+      if      (fabs(p_tmp-p) > 1) p-p_tmp>0?q+=1:q-=1;
+      else if (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
+      else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
+      else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
+      else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
+      else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
+      else p_tmp = p;
+
+      if (q <= TER(par)) q = TER(par)+0.0001;
+      iterations++;
+      if (iterations>= 10000) {
+        if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
+        break;
+      }
+    } while(fabs(p_tmp-p) > 0.00001);
+  return q;
+}
 double DWiener::q(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const
 {

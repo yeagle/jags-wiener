@@ -74,6 +74,8 @@ class DWiener : public ScalarDist
       std::vector<double const *> const &parameters,
       bool give_log) const;
 
+    double p_full(double q, std::vector<double const *> const &par, bool lower, 
+      bool give_log) const;
     double p(double q, std::vector<double const *> const &parameters, bool lower,
 	    bool give_log) const;
     double sign(double v) const;
@@ -86,6 +88,8 @@ class DWiener : public ScalarDist
     int K_small(double q, double v, double a, double w, double epsilon=WIENER_ERR) const;
     int K_large(double q, double v, double a, double w) const;
 
+    double q_full(double p, std::vector<double const *> const &parameters, bool lower,
+	    bool log_p) const;
     double q(double p, std::vector<double const *> const &parameters, bool lower,
 	    bool log_p) const;
     double r(std::vector<double const *> const &parameters, RNG *rng) const;
