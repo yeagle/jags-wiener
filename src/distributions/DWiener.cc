@@ -330,7 +330,10 @@ double DWiener::q_full(double p, vector<double const *> const &par, bool lower,
         break;
       }
     } while(fabs(p_tmp-p) > 0.00001);
-  return q;
+  //return q;
+  // quickfix
+  if (jags_isnan(q)) return 1;
+  else return q;
 }
 double DWiener::q(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const

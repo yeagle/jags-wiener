@@ -1,0 +1,9 @@
+model {
+  for (i in 1:n) {
+    x[i] ~ dwiener(alpha,tau,beta,delta)
+  }
+  alpha ~ dunif(-5,5)
+  tau ~ dunif(0,1)
+  beta ~ dunif(0,1)
+  delta ~ dunif(-5,5)
+}

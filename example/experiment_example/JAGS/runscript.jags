@@ -1,0 +1,22 @@
+# Module
+load wiener
+
+# Initialize model with 3 chains
+model in "../easy_model.txt"
+data in "easytask_data.txt"
+compile, nchains(3) 
+parameters in "inits1.txt"
+parameters in "inits2.txt"
+parameters in "inits3.txt"
+initialize 
+
+# Set trace monitor for node a,v,w,ter
+monitor alpha
+monitor tau
+monitor delta.mu
+monitor delta.si
+# 5 000
+update 5000
+
+# All monitored values are written out to file
+coda * 

@@ -1,0 +1,4 @@
+alpha <- 2
+tau <- 0.003
+delta.mu <- c(-1,1,0)
+delta.si <- 0.8
