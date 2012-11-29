@@ -1,21 +1,16 @@
 #ifndef DWIENER_DFUNC_H_
 #define DWIENER_DFUNC_H_
 
-#include <function/ScalarFunction.h>
+#include "WFunction.h"
 
 namespace wiener {
 
-class DFunction : public ScalarFunction 
+class DFunction : public WFunction 
 {
-  ScalarDist const *_dist;
-
   public:
-    DFunction(std::string const &name, ScalarDist const *dist);
+    DFunction(DWiener const *dist);
 
-    ScalarDist const *dist() const;
-    double evaluate(vector<double const *> const &args) const;
-    bool checkParameterValue(vector<double const *> const &args) const;
-    bool checkArgs(vector<double const *> const &args) const;
+    double evaluate(std::vector<double const *> const &args) const;
 };
 
 }

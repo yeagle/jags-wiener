@@ -1,0 +1,6 @@
+model {
+    for (i in 1:40) {
+      x[i] <- dwiener(t[i],3,.3,.5,0)
+      y[i] <- dlogwiener(t[i],3,.3,.5,0)
+    }
+}

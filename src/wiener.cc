@@ -38,16 +38,21 @@ class WIENERModule : public Module {
 
 WIENERModule::WIENERModule() : Module("wiener")
 {
-  dist = new DWiener
+  DWiener *wienerdist;
+  wienerdist = new DWiener;
   //load distributions
-  insert(dist);
+  insert(wienerdist);
   //load functions
-  insert(new DFunction(dist));
-  insert(new DLogFunction(dist));
+  insert(new DFunction(wienerdist));
+  insert(new DLogFunction(wienerdist));
 }
 
 WIENERModule::~WIENERModule() 
 {
+  vector<Function*> const &fvec = functions();
+  for (unsigned int i = 0; i < fvec.size(); ++i) {
+    delete fvec[i];
+  }
   vector<Distribution*> const &dvec = distributions();
   for (unsigned int i = 0; i < dvec.size(); ++i) {
     delete dvec[i];
