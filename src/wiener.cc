@@ -23,6 +23,8 @@
  */
 #include <Module.h>
 #include <distributions/DWiener.h>
+#include <functions/DFunction.h>
+#include <functions/DLogFunction.h>
 
 using std::vector;
 
@@ -36,8 +38,12 @@ class WIENERModule : public Module {
 
 WIENERModule::WIENERModule() : Module("wiener")
 {
-  //Load distributions
-  insert(new DWiener);
+  dist = new DWiener
+  //load distributions
+  insert(dist);
+  //load functions
+  insert(new DFunction(dist));
+  insert(new DLogFunction(dist));
 }
 
 WIENERModule::~WIENERModule() 

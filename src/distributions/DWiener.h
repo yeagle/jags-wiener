@@ -26,13 +26,13 @@
 #ifndef DWIENER_H_
 #define DWIENER_H_
 
-#include <config.h>
+//#include <config.h>
 #include <distribution/ScalarDist.h>
 
 #define WIENER_ERR 1e-10
 
 #ifndef M_LN_SQRT_PI
-#define M_LN_SQRT_PI	0.572364942924700087071713675677	/* log(sqrt(pi)) */
+#define M_LN_SQRT_PI  0.572364942924700087071713675677  /* log(sqrt(pi)) */
 #endif
 
 namespace wiener {
@@ -55,13 +55,13 @@ class DWiener : public ScalarDist
     DWiener();
 
     double logDensity(double x, PDFType type,
-		      std::vector<double const *> const &parameters,
-		      double const *lower, double const *upper) const;
+          std::vector<double const *> const &parameters,
+          double const *lower, double const *upper) const;
     double randomSample(std::vector<double const *> const &parameters,
-	   	double const *lower, double const *upper,
-	   	RNG *rng) const;
+       double const *lower, double const *upper,
+       RNG *rng) const;
     double typicalValue(std::vector<double const *> const &parameters,
-	   	double const *lower, double const *upper) const;
+       double const *lower, double const *upper) const;
     /**
      * Checks that:
      * a > 0
@@ -77,7 +77,7 @@ class DWiener : public ScalarDist
     double p_full(double q, std::vector<double const *> const &par, bool lower, 
       bool give_log) const;
     double p(double q, std::vector<double const *> const &parameters, bool lower,
-	    bool give_log) const;
+      bool give_log) const;
     double sign(double v) const;
     double F_lower(double q, double v, double a, double w) const;
     double Fl_lower(double q, double v, double a, double w, int K) const;
@@ -89,9 +89,9 @@ class DWiener : public ScalarDist
     int K_large(double q, double v, double a, double w) const;
 
     double q_full(double p, std::vector<double const *> const &parameters, bool lower,
-	    bool log_p) const;
+      bool log_p) const;
     double q(double p, std::vector<double const *> const &parameters, bool lower,
-	    bool log_p) const;
+      bool log_p) const;
     double r(std::vector<double const *> const &parameters, RNG *rng) const;
     //double r_random_walk(std::vector<double const *> const &parameters, RNG *rng, double dt=0.0001) const;
     //double r_rejection_based(std::vector<double const *> const &parameters, RNG *rng) const;
