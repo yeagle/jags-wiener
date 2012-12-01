@@ -6,8 +6,6 @@
 #include <cmath>
 #include <JRmath.h>
 
-#include <iostream>
-
 using std::vector;
 using std::log;
 using std::min;
@@ -86,20 +84,6 @@ double DWiener::randomSample(vector<double const *> const &parameters,
 double DWiener::typicalValue(vector<double const *> const &parameters,
 			  double const *lower, double const *upper) const
 {
-
-  double a = 0.1;
-  std::cout << q(a,parameters, true, false) << "\n";
-  std::cout << "pvalue: "
-    << p(q(a,parameters, true, false), parameters, true, false);
-  std::cout << "|||\n";
-  std::cout << q(-a,parameters, true, false) << "\n";
-  std::cout << "pvalue: "
-    << p(q(-a,parameters, true, false), parameters, true, false);
-  std::cout << "|||\n";
-  std::cout << q_full(a,parameters, true, false) << "\n";
-  std::cout << "pvalue: "
-    << p_full(q_full(a,parameters, true, false), parameters, true, false);
-  return 1;
 
   double llimit = l(parameters), ulimit = u(parameters);
   double plower = 0, pupper = 1;
