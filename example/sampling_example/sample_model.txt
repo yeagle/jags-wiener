@@ -1,4 +1,3 @@
 model {
-    x ~ dwiener(3,.3,.5,-1)
-
+    x ~ dwiener(1,.2,.3,0.3)
 }

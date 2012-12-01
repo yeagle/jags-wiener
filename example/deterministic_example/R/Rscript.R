@@ -6,7 +6,7 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2012-11-12
-# last mod 2012-11-29 14:27 DW
+# last mod 2012-11-29 19:19 DW
 #
 
 library(rjags)

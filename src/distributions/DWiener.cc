@@ -6,6 +6,8 @@
 #include <cmath>
 #include <JRmath.h>
 
+#include <iostream>
+
 using std::vector;
 using std::log;
 using std::min;
@@ -84,6 +86,21 @@ double DWiener::randomSample(vector<double const *> const &parameters,
 double DWiener::typicalValue(vector<double const *> const &parameters,
 			  double const *lower, double const *upper) const
 {
+
+  double a = 0.1;
+  std::cout << q(a,parameters, true, false) << "\n";
+  std::cout << "pvalue: "
+    << p(q(a,parameters, true, false), parameters, true, false);
+  std::cout << "|||\n";
+  std::cout << q(-a,parameters, true, false) << "\n";
+  std::cout << "pvalue: "
+    << p(q(-a,parameters, true, false), parameters, true, false);
+  std::cout << "|||\n";
+  std::cout << q_full(a,parameters, true, false) << "\n";
+  std::cout << "pvalue: "
+    << p_full(q_full(a,parameters, true, false), parameters, true, false);
+  return 1;
+
   double llimit = l(parameters), ulimit = u(parameters);
   double plower = 0, pupper = 1;
   
@@ -199,21 +216,23 @@ double DWiener::d(double x, PDFType type,
 double DWiener::p_full(double q, vector<double const *> const &par, bool lower, 
     bool give_log) const
 {
-  return (p(q,par,lower,give_log) + p(-q,par,lower,give_log));
+  if (q < 0) return JAGS_NAN;
+  else return (p(q,par,lower,give_log) + fabs(p(-q,par,lower,give_log)));
 }
 
 double DWiener::p(double q, vector<double const *> const &par, bool lower, 
     bool give_log) const
 {
+  // TODO: if not lower
+  // TODO: how to handle -t and +t (errors and correct responses)
   double p;
   if (jags_isnan(q)) return JAGS_NAN;
+  if (fabs(q) <= TER(par)) return give_log?JAGS_NEGINF:0;
   if (q < 0) { // lower boundary 0
     p = -F_lower(fabs(q)-TER(par), DRIFT(par), BOUND(par), BIAS(par));
-    if (!lower) p = -(0.5-fabs(p));
   }
   else { // upper boundary a
     p = F_lower(q-TER(par), (-DRIFT(par)), BOUND(par), (1-BIAS(par)));
-    if (!lower) p = 0.5-p;
   }
   // TODO: Make calculations more efficient by using give_log
   if (give_log) return p>0?log(p):-log(abs(p));
@@ -275,7 +294,7 @@ double DWiener::prob_upperbound(double v, double a, double w) const
 {
   double e = exp(-2.0 * v * a * (1.0-w));
   if(e == JAGS_POSINF) return 1;
-  else if(fabs(e - 1) < 0) return (1-w);
+  else if(v == 0 || w == 1) return (1-w);
   else return ((1 - e) / (exp(2.0*v*a*w) - e));
 }
 
@@ -309,58 +328,87 @@ int DWiener::K_small(double q, double v, double a, double w, double epsilon)  co
 double DWiener::q_full(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const
 {
-  double q=1;
-  double p_tmp;
-  unsigned int iterations = 0;
-  if (p > 1) return JAGS_NAN;
-    do {
-      p_tmp = this->p_full(q, par, lower, log_p);
-      if      (fabs(p_tmp-p) > 1) p-p_tmp>0?q+=1:q-=1;
-      else if (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
-      else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
-      else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
-      else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
-      else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
-      else p_tmp = p;
+  double p_tmp,pmin,pmax,pmid;
+  double qmin,qmax,q;
 
-      if (q <= TER(par)) q = TER(par)+0.0001;
-      iterations++;
-      if (iterations>= 10000) {
-        if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
-        break;
-      }
-    } while(fabs(p_tmp-p) > 0.00001);
-  //return q;
-  // quickfix
-  if (jags_isnan(q)) return 1;
-  else return q;
+  if (log_p) p_tmp = exp(p);
+  else p_tmp = p;
+
+  if (p_tmp > 1) return JAGS_NAN;
+
+  q = 1;
+  qmin = 0;
+  pmin = 0;
+  qmax = JAGS_POSINF;
+  pmax = 1;
+
+  int c=0;
+  do {
+    c++;
+    pmid = this->p_full(q, par, lower, false);
+    if (fabs(p_tmp)<=pmid) { // near lower point
+      pmax = pmid;
+      qmax = q;
+      q = qmin + (qmax-qmin)/2;
+    }
+    else { // near upper point
+      pmin = pmid;
+      qmin = q;
+      if (!(qmax == JAGS_NEGINF || qmax == JAGS_POSINF)) 
+        q = qmin + (qmax-qmin)/2;
+      else
+        q = q*10;
+    }
+  } while(fabs(p_tmp-pmid) > WIENER_ERR && c < 10000); // defines the accuracy
+
+  if (lower) return p>=0?q:-q;
+  else {
+    if (q>=0) return (1-q);
+    else return -(1-q);
+  }
 }
 double DWiener::q(double p, vector<double const *> const &par, bool lower, 
     bool log_p) const
 {
-  double q=1;
-  double p_tmp;
-  unsigned int iterations = 0;
-  if (p > 1 || p < -1) return JAGS_NAN;
-  if (p<0) q = -1;
-    do {
-      p_tmp = this->p(q, par, lower, log_p);
-      if      (fabs(p_tmp-p) > 1) p-p_tmp>0?q+=1:q-=1;
-      else if (fabs(p_tmp-p) > 0.1) p-p_tmp>0?q+=0.1:q-=0.1;
-      else if (fabs(p_tmp-p) > 0.01) p-p_tmp>0?q+=0.01:q-=0.01;
-      else if (fabs(p_tmp-p) > 0.0005) p-p_tmp>0?q+=0.0005:q-=0.0005;
-      else if (fabs(p_tmp-p) > 0.0001) p-p_tmp>0?q+=0.0001:q-=0.0001;
-      else if (fabs(p_tmp-p) > 0.00001) p-p_tmp>0?q+=0.00001:q-=0.00001;
-      else p_tmp = p;
+  double p_tmp,pmin,pmax,pmid;
+  double qmin,qmax,q;
 
-      if (q <= TER(par)) q = TER(par)+0.0001;
-      iterations++;
-      if (iterations>= 10000) {
-        if (fabs(p-p_tmp) > 0.01) q = JAGS_NAN;
-        break;
-      }
-    } while(fabs(p_tmp-p) > 0.00001);
-  return q;
+  if (log_p) p_tmp = exp(p);
+  else p_tmp = p;
+
+  if (fabs(p_tmp) > 1) return JAGS_NAN;
+
+  q = 1;
+  qmin = 0;
+  pmin = 0;
+  qmax = JAGS_POSINF;
+  pmax = 1;
+
+  int c=0;
+  do {
+    c++;
+    if (p_tmp>=0) pmid = this->p(q, par, lower, false);
+    else pmid = fabs(this->p(-q, par, lower, false));
+    if (fabs(p_tmp)<=pmid) { // near lower point
+      pmax = pmid;
+      qmax = q;
+      q = qmin + (qmax-qmin)/2;
+    }
+    else { // near upper point
+      pmin = pmid;
+      qmin = q;
+      if (!(qmax == JAGS_NEGINF || qmax == JAGS_POSINF)) 
+        q = qmin + (qmax-qmin)/2;
+      else
+        q = q*10;
+    }
+  } while(fabs(fabs(p_tmp)-pmid) > WIENER_ERR && c < 10000); // defines the accuracy
+
+  if (lower) return p>=0?q:-q;
+  else {
+    if (q>=0) return (1-q);
+    else return -(1-q);
+  }
 }
 
 double DWiener::r(vector<double const *> const &par, RNG *rng) const
