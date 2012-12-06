@@ -1,0 +1,48 @@
+# See Vandekerckhove (2010) for graphical model
+model {
+	for(c in 1:nc) {
+		v.mu[c] ~ dunif(-5.00, 5.00)
+		v.si[c] ~ dunif(0.0001, 3.00)
+		v.pr[c] <- pow(v.si[ c ], -2)
+	}
+
+	a.mu ~ dunif(0.0100, 3.00)
+	theta.mu ~ dunif(0.0100, 0.70)
+	chi.mu <- 0.35
+	eta.mu <- 3.5
+	b <- 0.5
+
+	a.si ~ dunif(0.0001, 2.00)
+	theta.si ~ dunif(0.0001, 0.25)
+	chi.si <- 0.125
+	eta.si <- 3.5
+
+	a.pr <- pow(a.si, -2)
+	theta.pr <- pow(theta.si, -2)
+	chi.pr <- pow(chi.si, -2)
+	eta.pr <- pow(eta.si, -2)
+
+	for(p in 1:np) {
+		a.p[p] ~ dnorm(a.mu, a.pr)
+
+		theta.p[p] ~ dnorm(theta.mu, theta.pr)
+		chi.p[p] ~ dnorm(chi.mu, chi.pr)
+		chi.p.pr[p] <- pow(chi.p[p], -2)
+
+		eta.p[p] ~ dnorm(eta.mu, eta.pr)
+		eta.p.pr[p] <- pow(eta.p[p], -2)
+		for(c in 1:nc) {
+			v.p[p, c] ~ dnorm(v.mu[c], v.pr[c])
+		}
+	}
+
+	for(i in 1:N) {
+		delta[i] ~ dnorm( v.p[pnum[i], cond[i]], eta.p.pr[pnum[i]] )
+		tau[i] ~ dnorm( theta.p[pnum[i]], chi.p.pr[pnum[i]] )
+		alpha[i] <- a.p[pnum[i]]
+		t[i] ~ dwiener(alpha[i], 
+			tau[i],
+			b,
+			delta[i])
+	}
+}
