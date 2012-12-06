@@ -13,8 +13,7 @@ initialize
 # Set trace monitor for node a,v,w,ter
 monitor alpha
 monitor tau
-monitor delta.mu
-monitor delta.si
+monitor delta
 # 5 000
 update 5000
 

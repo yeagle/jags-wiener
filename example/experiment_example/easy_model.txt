@@ -1,16 +1,13 @@
 model {
-  alpha ~ dunif(-3,3) # Estimate
+  alpha ~ dunif(0.0001,3) # Estimate
 
   tau ~ dunif(0,1)
 
   beta <- 0.5
 
   for (c in 1:C) {
-    delta[c] ~ dnorm(delta.mu[c], delta.pr)
-    delta.mu[c] ~ dunif(-7,7) # Estimate
+    delta[c] ~ dnorm(0, 1)
   }
-  delta.si ~ dunif(0.0001,9) # Estimate
-  delta.pr <- pow(delta.si, -2)
 
   for (i in 1:N) {
     y[i] ~ dwiener(alpha,tau,beta,delta[cond[i]])

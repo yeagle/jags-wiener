@@ -1,4 +1,3 @@
-
 # JAGS Wiener uses the nullsoft scriptable installer (http://nsis.sourceforge.net)
 # to create a binary package for Windows.
 # But first you need to create the binaries:
@@ -12,13 +11,17 @@
 # to:       c:/MinGW64 /mingw
 # to use TDM-GCC compilers
 
-# Put the JAGS lib and include files in /local 
-# on your Windows msys (or change paths accordingly)
-# Also before building: Edit the Makefile in src, to link to the correct
-# ljags-x
-# Otherwise you'll probably get a linker error, 
-# telling you that it cannot find ljags
+# The module needs the JAGS include files and
+# the JAGS libraries.
+# Therefore copy your installed JAGS files
+# to your msys directory and name the directory JAGS:
+# --> copy /install/of/JAGS/JAGS-x.x.x 
+# --> to mingwdir/msysdir/1.0/JAGS
+# (or change the include and lib paths below accordingly)
 
+# In case ld cannot find the libs, try to remove the -x in the dll name.
+# libjags-x.dll ----> libjags.dll
+# libjrmath-x.dll --> libjrmath.dll
 
 # Start msys, extract tarball in your home dir, 
 # cd into dir and do the following:
@@ -27,11 +30,15 @@
 
 # For building 32bit binaries
 CXX="g++ -m32" \
-./configure LDFLAGS="-L/local/lib -I/local/include/JAGS"
+./configure LDFLAGS="-L/JAGS/i386/bin" CXXFLAGS="-I/JAGS/include"
 
 # For building 64bit binaries
 CXX="g++ -m64" \
-./configure LDFLAGS="-L/local/lib -I/local/include/JAGS"
+./configure LDFLAGS="-L/JAGS/x64/bin" CXXFLAGS="-I/JAGS/include"
 
 # Copy the win/instxx/lib/modules-x/wiener.* files to your JAGS modules dir
 # to enable the module
+
+# Note: If you compile both 32bit and 64bit don't forget to
+# make clean
+# between the building

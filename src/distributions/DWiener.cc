@@ -24,8 +24,8 @@ DWiener::DWiener() : ScalarDist("dwiener", 4, DIST_UNBOUNDED)
 {}
 
 double DWiener::logDensity(double x, PDFType type,
-			vector<double const *> const &parameters,
-			double const *lower, double const *upper) const
+      vector<double const *> const &parameters,
+      double const *lower, double const *upper) const
 {
   if (lower && x < *lower) return JAGS_NEGINF;
   if (upper && x > *upper) return JAGS_NEGINF;
@@ -64,7 +64,7 @@ double DWiener::logDensity(double x, PDFType type,
 
 
 double DWiener::randomSample(vector<double const *> const &parameters,
-			  double const *lower, double const *upper, RNG *rng) const
+        double const *lower, double const *upper, RNG *rng) const
 {
   if (lower || upper) {
     double plower = 0, pupper = 1;
@@ -84,7 +84,7 @@ double DWiener::randomSample(vector<double const *> const &parameters,
 }
 
 double DWiener::typicalValue(vector<double const *> const &parameters,
-			  double const *lower, double const *upper) const
+        double const *lower, double const *upper) const
 {
   double llimit = l(parameters), ulimit = u(parameters);
   double plower = 0, pupper = 1;
@@ -100,7 +100,7 @@ double DWiener::typicalValue(vector<double const *> const &parameters,
   }
   
   double pmed = (plower + pupper)/2;
-  double med = q_full(pmed, parameters, true, false);	
+  double med = q_full(pmed, parameters, true, false);  
 
   //Calculate the log densities
   double dllimit = d(llimit, PDF_FULL, parameters, true);
@@ -229,7 +229,8 @@ double DWiener::p(double q, vector<double const *> const &par, bool lower,
   else return p;
 }
 
-double DWiener::sign(double v) const {
+double DWiener::sign(double v) const 
+{
   if (v == 0) return 0;
   else if (v>0) return 1;
   else if (v<0) return -1;
@@ -409,17 +410,17 @@ double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, doubl
   double t,sigma=1;
   double p = .5 * (1+((DRIFT(par)*sqrt(dt))/sigma));
   //double q = .5 * (1-((mu*sqrt(dt))/sigma));
-	int i = 0;
-	double y = BIAS(par)*BOUND(par);
-	while(y < BOUND(par) && y > 0)
-	{
+  int i = 0;
+  double y = BIAS(par)*BOUND(par);
+  while(y < BOUND(par) && y > 0)
+  {
     if(rng->uniform() <= p) y = y + sigma*sqrt(dt);
     else y = y - sigma*sqrt(dt);
-		i++;
-	}
+    i++;
+  }
   if(y >= BOUND(par)) t = (i*dt+TER(par));
   else t = -(i*dt+TER(par));
-	return t;
+  return t;
 
 }
 
@@ -427,15 +428,15 @@ double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, doubl
 double DWiener::r_random_walk(vector<double const *> const &par, RNG *rng, double dt) const
 {
   double t,sigma=1;
-	unsigned int i = 0;
-	double y = BIAS(par)*BOUND(par);
-	while(y < BOUND(par) && y > 0) {
-		y = y + sqrt(dt) * (sigma*rng->normal()+DRIFT(par));
-		i+=1;
-	}
+  unsigned int i = 0;
+  double y = BIAS(par)*BOUND(par);
+  while(y < BOUND(par) && y > 0) {
+    y = y + sqrt(dt) * (sigma*rng->normal()+DRIFT(par));
+    i+=1;
+  }
   if(y >= BOUND(par)) t = -(i*dt+TER(par));
   else t = i*dt+TER(par);
-	return t;
+  return t;
 }
 
 // TODO: Need to find error in this function...
