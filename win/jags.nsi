@@ -1,5 +1,5 @@
-!define APP_NAME "JAGS-WIENER-MODULE"
-!define PUBLISHER "JAGS-WIENER-MODULE"
+!define APP_NAME "JAGS-wiener"
+!define PUBLISHER "JAGS-wiener"
 
 ;Name used for JAGS Wiener module registry keys
 !define WIENER_KEYNAME "${APP_NAME}-${VERSION}"
@@ -20,7 +20,7 @@
 !define MULTIUSER_INSTALLMODE_INSTDIR "${J_PUBLISHER}\${JAGS_KEYNAME}"
 !define MULTIUSER_INSTALLMODE_INSTDIR_REGISTRY_KEY "SOFTWARE\${J_PUBLISHER}\${JAGS_KEYNAME}"
 !define MULTIUSER_INSTDIR_REGISTRY_VALUENAME "InstallDir"
-!define UNINSTALL_LOG "Uninstall-Wiener"
+!define UNINSTALL_LOG "Uninstall-wiener"
 
 !addincludedir ${JAGSINC}
 !include AdvUninstLog.nsh
@@ -139,6 +139,7 @@ Section "Uninstall"
    ;uninstall from path, must be repeated for every install logged path individually
    !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR\i386\modules"
    !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR\x64\modules"
+   !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR"
    !insertmacro UNINSTALL.LOG_END_UNINSTALL
 
    DeleteRegKey /ifempty ${INSTDIR_REG_ROOT} "${INSTDIR_REG_KEY}"
