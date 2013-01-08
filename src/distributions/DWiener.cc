@@ -6,12 +6,11 @@
 #include <cmath>
 #include <JRmath.h>
 
-#include <iostream>
-
 using std::vector;
 using std::log;
 using std::min;
 using std::max;
+using std::string;
 
 #define BOUND(par) (*par[0])
 #define TER(par) (*par[1])
@@ -21,6 +20,9 @@ using std::max;
 namespace wiener {
 
 DWiener::DWiener() : ScalarDist("dwiener", 4, DIST_UNBOUNDED)
+{}
+
+DWiener::DWiener(string const &name, unsigned int npar) : ScalarDist(name, npar, DIST_UNBOUNDED)
 {}
 
 double DWiener::logDensity(double x, PDFType type,

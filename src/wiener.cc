@@ -23,6 +23,7 @@
  */
 #include <Module.h>
 #include <distributions/DWiener.h>
+#include <distributions/DWieners.h>
 #include <functions/DFunction.h>
 #include <functions/DLogFunction.h>
 
@@ -39,9 +40,10 @@ class WIENERModule : public Module {
 WIENERModule::WIENERModule() : Module("wiener")
 {
   DWiener *wienerdist;
-  wienerdist = new DWiener;
+  wienerdist = new DWiener();
   //load distributions
   insert(wienerdist);
+  insert(new DWieners(wienerdist));
   //load functions
   insert(new DFunction(wienerdist));
   insert(new DLogFunction(wienerdist));

@@ -28,6 +28,7 @@ class DWiener : public ScalarDist
 {
   public:
     DWiener();
+    DWiener(std::string const &name, unsigned int npar);
 
     double logDensity(double x, PDFType type,
           std::vector<double const *> const &parameters,

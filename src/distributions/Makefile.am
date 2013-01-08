@@ -5,6 +5,6 @@ wienerdist_la_CPPFLAGS = -I$(top_srcdir)/src \
 
 wienerdist_la_LDFLAGS = -no-undefined -module -avoid-version
 
-wienerdist_la_SOURCES = DWiener.cc
+wienerdist_la_SOURCES = DWiener.cc DWieners.cc
 
-noinst_HEADERS = DWiener.h 
+noinst_HEADERS = DWiener.h DWieners.h
