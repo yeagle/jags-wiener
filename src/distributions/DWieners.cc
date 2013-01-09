@@ -17,6 +17,16 @@ using std::max;
 #define DRIFT(par) (*par[3])
 #define SD(par) (*par[4])
 
+/*
+ * TODO : This file contains really bad code, that slows the wieners node extremely!
+ * Contributions to improve this code are encouraged and very welcome.
+ *
+ * I just don't know how to alter the ' vector<double const *> const '
+ * parameter vector in an efficient way...
+ *
+ * There's also a lot of redudnant code to get rid of...
+ */
+
 namespace wiener {
 
 DWieners::DWieners(DWiener const *dist)

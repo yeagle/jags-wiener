@@ -6,7 +6,7 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2013-01-07
-# last mod 2013-01-09 13:17 DW
+# last mod 2013-01-09 13:27 DW
 #
 library(rjags)
 load.module("wiener")
@@ -41,7 +41,7 @@ points(density(x3), type="l", col="red")
 ## sample and estimate
 
 sample_model <- textConnection("model {
-  x ~ dwieners(2,.2,.3,0,0.1)
+  x ~ dwieners(.2,.2,.3,0,0.1)
 }")
 
 wiener_model <- textConnection("model {
