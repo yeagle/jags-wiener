@@ -2,8 +2,6 @@
 #include "DWiener.h"
 #include "DWieners.h"
 
-#include <distribution/ScalarDist.h>
-
 #include <rng/RNG.h>
 #include <util/nainf.h>
 #include <cmath>
@@ -17,7 +15,7 @@ using std::max;
 #define TER(par) (*par[1])
 #define BIAS(par) (*par[2])
 #define DRIFT(par) (*par[3])
-#define SD(par) (*par[3])
+#define SD(par) (*par[4])
 
 namespace wiener {
 
@@ -25,56 +23,148 @@ DWieners::DWieners(DWiener const *dist)
   : DWiener("dwieners", 5), _dist(dist)
 {}
 
-vector<double const *> DWieners::get_params(vector<double const *> const &par) const
+bool DWieners::checkParameterValue (vector<double const *> const &par) const
 {
-  vector<double *> params(4);
-  *params[0] = BOUND(par)*SD(par);
-  *params[1] = TER(par);
-  *params[2] = BIAS(par)*SD(par);
-  *params[3] = DRIFT(par)*SD(par);
+    return (BOUND(par)*SD(par)>0 && 
+            BIAS(par)<1 && BIAS(par)>0 &&
+            TER(par) > 0 && SD(par) > 0);
+}
 
-  vector<double const *> paramsconst(4);
-  paramsconst[0] = params[0];
-  paramsconst[1] = params[1];
-  paramsconst[2] = params[2];
-  paramsconst[3] = params[3];
-
-  return paramsconst;
+void DWieners::get_params(vector<double const *> const &par, vector<double const *> &params) const
+{
+  // TODO : replace redundant code and use this function
 }
 
 double DWieners::d(double x, PDFType type, 
          vector<double const *> const &par, bool give_log) const
 {
-  return _dist->d(x, type, get_params(par), give_log);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+
+  return _dist->d(x, type, params, give_log);
 }
 
-double DWieners::p_full(double q, std::vector<double const *> const &par, bool lower, 
+double DWieners::p_full(double q, vector<double const *> const &par, bool lower, 
   bool give_log) const
 {
-  return _dist->p_full(q, get_params(par), lower, give_log);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+  return _dist->p_full(q, params, lower, give_log);
 }
 
-double DWieners::p(double q, std::vector<double const *> const &parameters, bool lower,
+double DWieners::p(double q, vector<double const *> const &par, bool lower,
   bool give_log) const
 {
-  return _dist->p(q, get_params(parameters), lower, give_log);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+  return _dist->p(q, params, lower, give_log);
 }
 
-double DWieners::q_full(double p, std::vector<double const *> const &parameters, bool lower,
+double DWieners::q_full(double p, vector<double const *> const &par, bool lower,
   bool log_p) const
 {
-  return _dist->q_full(p, get_params(parameters), lower, log_p);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+  return _dist->q_full(p, params, lower, log_p);
 }
 
-double DWieners::q(double p, std::vector<double const *> const &parameters, bool lower,
+double DWieners::q(double p, vector<double const *> const &par, bool lower,
   bool log_p) const
 {
-  return _dist->q(p, get_params(parameters), lower, log_p);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+  return _dist->q(p, params, lower, log_p);
 }
 
-double DWieners::r(std::vector<double const *> const &parameters, RNG *rng) const
+double DWieners::r(vector<double const *> const &par, RNG *rng) const
 {
-  return _dist->r(get_params(parameters), rng);
+  double bound,ter,bias,drift;
+  bound = BOUND(par)/SD(par);
+  ter = TER(par);
+  bias = BIAS(par);
+  drift = DRIFT(par)/SD(par);
+
+  double *boundp = &bound; 
+  double *terp = &ter; 
+  double *biasp = &bias; 
+  double *driftp = &drift; 
+
+  vector<double const *> params(4);
+  params[0] = boundp;
+  params[1] = terp;
+  params[2] = biasp;
+  params[3] = driftp;
+  return _dist->r(params, rng);
 }
 
 }

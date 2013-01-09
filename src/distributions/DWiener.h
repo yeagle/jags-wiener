@@ -30,6 +30,10 @@ class DWiener : public ScalarDist
     DWiener();
     DWiener(std::string const &name, unsigned int npar);
 
+    /* 
+     * logDensity, randomSample and typicalValue use the below defined
+     * d,p,q,r functions
+     */
     double logDensity(double x, PDFType type,
           std::vector<double const *> const &parameters,
           double const *lower, double const *upper) const;
@@ -38,7 +42,7 @@ class DWiener : public ScalarDist
        RNG *rng) const;
     double typicalValue(std::vector<double const *> const &parameters,
        double const *lower, double const *upper) const;
-    /**
+    /* 
      * Checks that:
      * a > 0
      * w in intervall [0,1] 
@@ -46,13 +50,15 @@ class DWiener : public ScalarDist
      */
     bool checkParameterValue(std::vector<double const *> const &parameters) const;
 
-    double d(double x, PDFType type,
+    // PDF function
+    virtual double d(double x, PDFType type,
       std::vector<double const *> const &parameters,
       bool give_log) const;
 
-    double p_full(double q, std::vector<double const *> const &par, bool lower, 
+    // CDF function
+    virtual double p_full(double q, std::vector<double const *> const &par, bool lower, 
       bool give_log) const;
-    double p(double q, std::vector<double const *> const &parameters, bool lower,
+    virtual double p(double q, std::vector<double const *> const &parameters, bool lower,
       bool give_log) const;
     double sign(double v) const;
     double F_lower(double q, double v, double a, double w) const;
@@ -64,11 +70,14 @@ class DWiener : public ScalarDist
     int K_small(double q, double v, double a, double w, double epsilon=WIENER_ERR) const;
     int K_large(double q, double v, double a, double w) const;
 
-    double q_full(double p, std::vector<double const *> const &parameters, bool lower,
+    // quantile function
+    virtual double q_full(double p, std::vector<double const *> const &parameters, bool lower,
       bool log_p) const;
-    double q(double p, std::vector<double const *> const &parameters, bool lower,
+    virtual double q(double p, std::vector<double const *> const &parameters, bool lower,
       bool log_p) const;
-    double r(std::vector<double const *> const &parameters, RNG *rng) const;
+    
+    // random sampling function
+    virtual double r(std::vector<double const *> const &parameters, RNG *rng) const;
     //double r_random_walk(std::vector<double const *> const &parameters, RNG *rng, double dt=0.0001) const;
     //double r_rejection_based(std::vector<double const *> const &parameters, RNG *rng) const;
     //double r_rejection_based_symmetric(std::vector<double> par, RNG *rng) const;

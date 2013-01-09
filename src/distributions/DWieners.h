@@ -5,6 +5,13 @@
 
 namespace wiener {
 
+/*
+ * This class redefines the boundary separation parameter (alpha) and the drift
+ * rate parameter (delta) and calls the apropriate d,p,q,r functions of the wiener
+ * distribution functions with s=1.
+ * Therefore only the d,p,q,r functions need to be overloaded, all other
+ * functions can just be inherited.
+ */
 class DWieners : public DWiener
 {
   DWiener const *_dist;
@@ -12,7 +19,9 @@ class DWieners : public DWiener
   public:
     DWieners(DWiener const *dist);
 
-    std::vector<double const *> get_params(std::vector<double const *> const &par) const;
+    bool checkParameterValue (std::vector<double const *> const &par) const;
+
+    void get_params(std::vector<double const *> const &par, std::vector<double const *> &params) const;
 
     double d(double x, PDFType type,
       std::vector<double const *> const &parameters,

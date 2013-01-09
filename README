@@ -15,6 +15,17 @@ With the parameters:
   - beta being the bias
   - delta being the driftrate
 
+There is also a second distribution:
+
+x ~ dwieners(alpha,tau,beta,delta,1)
+
+with the last parameter as standard deviation of the drift process.
+
+And there are two logical nodes:
+
+  - dwiener(x, alpha,tau,beta,delta)
+  - dlogwiener(x, alpha,tau,beta,delta)
+
 PLEASE NOTE
 Copyright (C) 2012 Dominik Wabersich <dominik.wabersich@gmail.com>
 and Joachim Vandekerckhove <joachim@uci.edu>
