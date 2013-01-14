@@ -7,7 +7,7 @@ wiener_la_SOURCES = wiener.cc
 wiener_la_CPPFLAGS = -I$(includedir)/JAGS
 
 wiener_la_LIBADD = distributions/wienerdist.la \
-									 functions/wienerfunc.la \ 
+									 functions/wienerfunc.la
 if WINDOWS
 wiener_la_LIBADD += -ljags-$(JAGS_MAJOR) -ljrmath-0
 else
