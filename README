@@ -26,14 +26,18 @@ And there are two logical nodes:
   - dwiener(x, alpha,tau,beta,delta)
   - dlogwiener(x, alpha,tau,beta,delta)
 
+to calculate the (log-) density at value x.
+
 PLEASE NOTE
 Copyright (C) 2012 Dominik Wabersich <dominik.wabersich@gmail.com>
 and Joachim Vandekerckhove <joachim@uci.edu>
 
 When using this module, please cite as: 
-    Wabersich, D. and Vandekerckhove, J. (in preparation). Hacking JAGS: 
-    Adding custom distributions to JAGS, with a diffusion model example.
+    Wabersich, D. and Vandekerckhove, J. (in preparation). Extending JAGS: 
+    A tutorial on adding custom distributions to JAGS (with a diffusion
+    model example)
 
+LICENSE
 This program is free software; you can redistribute it and/or modify
 it under the terms of the GNU Lesser General Public License as published by
 the Free Software Foundation; either version 2.1 of the License, or

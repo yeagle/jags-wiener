@@ -1,27 +1,24 @@
 # JAGS Wiener uses the nullsoft scriptable installer (http://nsis.sourceforge.net)
-# to create a binary package for Windows.
+# to create a binary installation package for Windows.
 # But first you need to create the binaries:
 
 # Install MinGW (MinGW installer including msys) 
 # and TDM-GCC Compiler Suite
 # http://www.mingw.org
 # http://tdm-gcc.tdragon.net 
+#
 # change path in c:/mingw/msys/1.0/etc/fstab from
 # this:     c:/mingw /mingw
 # to:       c:/MinGW64 /mingw
 # to use TDM-GCC compilers
+#
+# IMPORTANT: If you get errors when loading the compiled module,
+# try to use the exact same version of tdm-gcc as the used JAGS Version
+# does.
 
 # The module needs the JAGS include files and
 # the JAGS libraries.
-# Therefore copy your installed JAGS files
-# to your msys directory and name the directory JAGS:
-# --> copy /install/of/JAGS/JAGS-x.x.x 
-# --> to mingwdir/msysdir/1.0/JAGS
-# (or change the include and lib paths below accordingly)
-
-# In case ld cannot find the libs, try to remove the -x in the dll name.
-# libjags-x.dll ----> libjags.dll
-# libjrmath-x.dll --> libjrmath.dll
+# Therefore use the -L and -I options, as shown below
 
 # Start msys, extract tarball in your home dir, 
 # cd into dir and do the following:
@@ -30,11 +27,11 @@
 
 # For building 32bit binaries
 CXX="g++ -m32" \
-./configure LDFLAGS="-L/JAGS/i386/bin" CXXFLAGS="-I/JAGS/include"
+./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.3.0/i386/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.3.0/include"
 
 # For building 64bit binaries
 CXX="g++ -m64" \
-./configure LDFLAGS="-L/JAGS/x64/bin" CXXFLAGS="-I/JAGS/include"
+./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.3.0/x64/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.3.0/include"
 
 # Copy the win/instxx/lib/modules-x/wiener.* files to your JAGS modules dir
 # to enable the module
