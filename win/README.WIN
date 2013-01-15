@@ -14,7 +14,9 @@
 #
 # IMPORTANT: If you get errors when loading the compiled module,
 # try to use the exact same version of tdm-gcc as the used JAGS Version
-# does.
+# does. In that case, also don't forget to untick the 
+# "Check for updated files on the TDM-GCC server" 
+# during the installation proccess of tdm-gcc. 
 
 # The module needs the JAGS include files and
 # the JAGS libraries.
@@ -29,12 +31,17 @@
 CXX="g++ -m32" \
 ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.3.0/i386/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.3.0/include"
 
+make win32-install
+
 # For building 64bit binaries
 CXX="g++ -m64" \
 ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.3.0/x64/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.3.0/include"
 
+make win64-install
+
 # Copy the win/instxx/lib/modules-x/wiener.* files to your JAGS modules dir
-# to enable the module
+# to enable the module.
+# Or run the NSIS script to create an installer.
 
 # Note: If you compile both 32bit and 64bit don't forget to
 # make clean
