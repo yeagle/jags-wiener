@@ -6,6 +6,8 @@
 # and TDM-GCC Compiler Suite
 # http://www.mingw.org
 # http://tdm-gcc.tdragon.net 
+# And delete all *.dll.a files int the TDM-GCC Installation, so the
+# compiler will link to the static libraries.
 #
 # change path in c:/mingw/msys/1.0/etc/fstab from
 # this:     c:/mingw /mingw

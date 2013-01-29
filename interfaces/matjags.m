@@ -265,13 +265,14 @@ elseif doParallel && isunix
         fprintf( fid , 'export LD_LIBRARY_PATH=%s; %s %s\n' , libpath , jagsPrefix , jagsScript ) ;
     end
     fclose( fid ) ;
-    % Leave parallelization to GNU parallel.
-    cmd = sprintf( 'cat %s | xargs' , tfn ) ;
     if verbosity > 0
-        fprintf( 'Running %d chains (parallel execution)\n' , nChains ) ;
+        fprintf( 'Running %d chains (parallel execution):  ' , nChains ) ;
         disp( [ '$ ' cmd ] ) ;
     end
-%     cmd = sprintf( 'cat %s | parallel' , tfn ) ;
+    % Leave parallelization to GNU parallel. Find it at http://www.gnu.org/software/parallel
+    % To run without GNU parallel, replace with xargs for serial processing.
+%     cmd = sprintf( 'cat %s | xargs' , tfn ) ;
+    cmd = sprintf( 'cat %s | parallel' , tfn ) ;
     [ status , result ] = dos( cmd ) ;
     status = repmat( {status} , 1 , nChains ) ;
     result = repmat( {result} , 1 , nChains ) ;
