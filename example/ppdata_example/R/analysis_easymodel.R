@@ -6,7 +6,7 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2012-11-02
-# last mod 2012-12-06 14:20 DW
+# last mod 2013-03-20 10:57 DW
 #
 
 # NOTE: Everything looks fine after burning and thinning
@@ -15,6 +15,7 @@ library(rjags)
 # load samples
 load("rdata/easymodel_50000.rdata")
 
+# note: there are a lot more elegant ways to reshape the data
 a.mu <- samples[,1]
 a.si <- samples[,2]
 dev <- samples[,3]
@@ -31,6 +32,7 @@ v.si3 <- samples[,13]
 v.si4 <- samples[,14]
 v.si5 <- samples[,15]
 
+# note: using the command window() for burning and thinnig is better
 burnin <- 1000
 nsamp <- length(samples[[1]][,1])
 thin <- 1000
