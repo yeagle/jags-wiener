@@ -6,12 +6,15 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2013-01-07
-# last mod 2013-01-09 13:27 DW
+# last mod 2013-04-28 15:50 DW
 #
+
+# Load rjags library and the wiener module
 library(rjags)
 load.module("wiener")
 
-## sample and compare
+#1
+## Sample and compare
 
 sample_model1 <- textConnection("model {
   x ~ dwiener(1,.2,.3,2)
@@ -37,8 +40,8 @@ plot(density(x1), xlim=c(-1.5,1.5), ylim=c(0,4))
 points(density(x2), type="l", col="grey")
 points(density(x3), type="l", col="red")
 
-
-## sample and estimate
+#2
+## Sample and estimate
 
 sample_model <- textConnection("model {
   x ~ dwieners(.2,.2,.3,0,0.1)
@@ -54,11 +57,11 @@ wiener_model <- textConnection("model {
   delta ~ dunif(-5,5)
 }")
 
-# sample
+# Sample
 samplemodel <- jags.model(sample_model,n.chains=1,n.adapt=0)
 samples <- coda.samples(samplemodel,c("x"), n.iter=1000, thin=1)
 
-# now estimate parameters back
+# Now estimate parameters back
 dat <- list(x=as.vector(samples[[1]][,1]), n=length(as.vector(samples[[1]][,1])))
 inits <- list(alpha=1,tau=0.001,beta=0.5,delta=0)
 estmodel <- jags.model(wiener_model,data=dat,inits=inits,n.chains=1,n.adapt=1)

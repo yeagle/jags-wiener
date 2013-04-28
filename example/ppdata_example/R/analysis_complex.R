@@ -6,11 +6,14 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2012-11-02
-# last mod 2012-12-06 14:21 DW
+# last mod 2013-04-28 15:19 DW
 #
 
 # NOTE: the chains for eta.mu and eta.si do not converge
 # Except for that, everything looks fine after burning and thinning
+# NOTE2: the presented way of handling the data is rather complex. See the
+# methods used in analysis_easymodel.R for a neater way, as it basically
+# does the same analysis in almost half the lines of code.
 
 library(rjags)
 # load samples
