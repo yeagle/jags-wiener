@@ -6,7 +6,7 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2012-11-02
-# last mod 2013-04-28 15:16 DW
+# last mod 2013-04-28 22:55 DW
 #
 
 # load all the required libraries, starting with rjags
@@ -21,12 +21,12 @@ namelist <- list("a.mu","a.si","theta.mu","theta.s",
               "v.mu1","v.mu2","v.mu3","v.mu4","v.mu5",
               "v.si1","v.si2","v.si3","v.si4","v.si5","deviance")
 # trace
-for (i in 1:length(samplelist)) {
+for (i in 1:15) {
   x11()
   traceplot(samples[,i], main=namelist[[i]], xlim=c(1,2000))
 }
 # density
-for (i in 1:length(samplelist)) {
+for (i in 1:15) {
   #x11()
   densplot(samples[,i], main=namelist[[i]])
 }
@@ -39,9 +39,9 @@ thin <- 1000
 iid_samples <- window(samples, burnin,nsamp,thin)
 
 # density for iid_samples
-for ( i in 1:length(iid_samples[1,])) {
+for (i in 1:15) {
   #x11()
-  plot(density(iid_samples[,i]), main=namelist[i])
+  densplot(iid_samples[,i], main=namelist[i])
 }
 
 # autocorrelation for chain 1
@@ -55,24 +55,23 @@ gelman.diag(iid_samples)
 gelman.diag(samples[,9])
 
 # model estimates for v.mu
-summary(iid_samples)$statistic
+round(summary(iid_samples)$statistic,4)
 
 # deviance plot for good and bad chain
 layout(matrix(c(1,1,2,3,3,4),2,3,T))
 # bad chain from orig samples: deviance
-traceplot(samples[,15], xlim=c(48000,50000), ylim=c(-10000,-4000),
-          main="Original Deviance samples (Bad chain)")
+traceplot(samples[,15], xlim=c(48000,48040),
+          main="Original Deviance samples")
 autocorr.plot(samples[,15][[1]], auto.layout=F, lag.max=20)
 # good chain from iid samples: deviance
 traceplot(iid_samples[,15],
-          main="Deviance after thinning and burning (Good chain)",
-          ylim=c(-9600,-5300))
+          main="Deviance after thinning and burning")
 autocorr.plot(iid_samples[,15][[1]], auto.layout=F, lag.max=20)
 
 # v.si5
 par(mfrow=c(2,1))
 # bad chain from orig samples: deviance
-traceplot(samples[,14], 
+traceplot(samples[,14], xlim=c(1000,1040),
           main="Original v.si(5) samples (Bad chain)")
 # Good chain from iid samples: deviance
 traceplot(iid_samples[,14],
