@@ -6,7 +6,7 @@
 # GPL 3.0+ or (cc) by-sa (http://creativecommons.org/licenses/by-sa/3.0/)
 #
 # created 2012-11-01
-# last mod 2013-04-28 14:48 DW
+# last mod 2013-05-09 14:22 DW
 #
 
 # This script demonstrates how to call JAGS from R, load the jags-wiener
@@ -54,6 +54,13 @@ complexmodel <- jags.model("../complexmodel.txt", dat, cminits, 3, 0)
 # nodes of interest, including the special diagnostic node "deviance".
 # Alternatively, one can use the command jags.samples(), which works the
 # same but returns the samples in a different data type
+#
+# If you get a WARNING or NOTE that says 'Adaptation incomplete' or
+# 'Stopping adaptation', ignore it. This message is a JAGS warning that the
+# burn-in phase is not completed and the user will need to manually discard
+# some of the initial samples (in practice, we rarely rely on JAGS'
+# judgment regarding the burn-in phase; it is currently based solely on the
+# number of samples drawn, with no regard for actual convergence quality)
 samples <- coda.samples(complexmodel, c("v.mu","v.si","a.mu","a.si",
                                      "theta.mu","theta.si", "eta.mu",
                                      "eta.si", "chi.mu", "chi.si",
