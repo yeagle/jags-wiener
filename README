@@ -40,6 +40,22 @@ When using this module, please cite as:
     A tutorial on adding custom distributions to JAGS (with a diffusion
     model example)
 
+Known Issues
+------------
+* Loading of the JAGS Wiener Module does not work (so far reported only by mac users).
+
+  3 reasons for this issue are possible:
+  - File permissions of the library files are wrong.
+  - The library files are installed in a different location than the JAGS
+    installation.
+  - The library files have been compiled with a different gcc version than
+    the JAGS installation.
+  
+  The easiest way to solve this issue, is by removing both, the JAGS and
+  JAGS Wiener Module installation. Afterwards, recompile and install first JAGS,
+  then the JAGS Wiener Module. If the same gcc version and the same
+  installation procedure have been used, it should work.
+
 License
 -------
 This program is free software; you can redistribute it and/or modify
