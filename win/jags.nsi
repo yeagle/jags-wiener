@@ -8,7 +8,7 @@
 
 ;JAGS Variables
 !define J_PUBLISHER "JAGS"
-!define JAGS_KEYNAME "JAGS-3.3.0"
+!define JAGS_KEYNAME "JAGS-4.0.0"
 
 !define MULTIUSER_MUI
 !define MULTIUSER_EXECUTIONLEVEL Highest
