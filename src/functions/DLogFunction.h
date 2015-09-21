@@ -3,6 +3,7 @@
 
 #include "WFunction.h"
 
+namespace jags {
 namespace wiener {
 
 class DLogFunction : public WFunction 
@@ -13,6 +14,7 @@ class DLogFunction : public WFunction
     double evaluate(std::vector<double const *> const &args) const;
 };
 
-}
+} //namespace wiener
+} //namespace jags
 
 #endif /* DWIENER_DLOGFUNC_H_ */

@@ -5,6 +5,7 @@
 using std::vector;
 using std::string;
 
+namespace jags {
 namespace wiener {
 
 DLogFunction::DLogFunction(DWiener const *dist)
@@ -21,4 +22,5 @@ double DLogFunction::evaluate(vector<double const *> const &args) const
   return dist()->d(x, PDF_FULL, param, true);
 }
 
-}
+} //namespace wiener
+} //namespace jags

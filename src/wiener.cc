@@ -21,7 +21,7 @@
  *  Foundation, Inc., 51 Franklin Street, Fifth Floor, Boston, MA 02110-1301  USA
  *
  */
-#include <Module.h>
+#include <module/Module.h>
 #include <distributions/DWiener.h>
 #include <distributions/DWieners.h>
 #include <functions/DFunction.h>
@@ -29,6 +29,7 @@
 
 using std::vector;
 
+namespace jags {
 namespace wiener {
 
 class WIENERModule : public Module {
@@ -62,5 +63,6 @@ WIENERModule::~WIENERModule()
 }
 
 } // namespace wiener
+} // namespace jags
 
-wiener::WIENERModule _wiener_module;
+jags::wiener::WIENERModule _wiener_module;

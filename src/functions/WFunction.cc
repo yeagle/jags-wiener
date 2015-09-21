@@ -5,6 +5,7 @@
 using std::vector;
 using std::string;
 
+namespace jags {
 namespace wiener {
 
 WFunction::WFunction(string const &name, DWiener const *dist)
@@ -30,4 +31,5 @@ bool WFunction::checkArgs(vector<double const *> const &args) const
   return _dist->checkParameterValue(param);
 }
 
-}
+} //namespace wiener
+} //namespace jags

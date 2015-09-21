@@ -3,6 +3,7 @@
 
 #include <function/ScalarFunction.h>
 
+namespace jags {
 namespace wiener {
 
 class WFunction : public ScalarFunction 
@@ -18,6 +19,7 @@ class WFunction : public ScalarFunction
     bool checkArgs(std::vector<double const *> const &args) const;
 };
 
-}
+} //namespace wiener
+} //namespace jags
 
 #endif /* DWIENER_WFUNC_H_ */

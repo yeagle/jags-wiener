@@ -27,6 +27,7 @@ using std::max;
  * There's also a lot of redudnant code to get rid of...
  */
 
+namespace jags {
 namespace wiener {
 
 DWieners::DWieners(DWiener const *dist)
@@ -177,4 +178,5 @@ double DWieners::r(vector<double const *> const &par, RNG *rng) const
   return _dist->r(params, rng);
 }
 
-}
+} //namespace wiender
+} //namespace jags

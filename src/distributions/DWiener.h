@@ -10,6 +10,7 @@
 #define M_LN_SQRT_PI  0.572364942924700087071713675677  /* log(sqrt(pi)) */
 #endif
 
+namespace jags {
 namespace wiener {
 
 /**
@@ -60,7 +61,6 @@ class DWiener : public ScalarDist
       bool give_log) const;
     virtual double p(double q, std::vector<double const *> const &parameters, bool lower,
       bool give_log) const;
-    double sign(double v) const;
     double F_lower(double q, double v, double a, double w) const;
     double Fl_lower(double q, double v, double a, double w, int K) const;
     double Fs_lower(double q, double v, double a, double w, int K) const;
@@ -84,6 +84,7 @@ class DWiener : public ScalarDist
     double r_rejection_based_2(double a, double ter, double z, double v, RNG *rng) const;
 };
 
-}
+} //namespace wiener
+} //namespace jags
 
 #endif /* DWIENER_H_ */

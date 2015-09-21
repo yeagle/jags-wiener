@@ -17,6 +17,7 @@ using std::string;
 #define BIAS(par) (*par[2])
 #define DRIFT(par) (*par[3])
 
+namespace jags {
 namespace wiener {
 
 DWiener::DWiener() : ScalarDist("dwiener", 4, DIST_UNBOUNDED)
@@ -229,13 +230,6 @@ double DWiener::p(double q, vector<double const *> const &par, bool lower,
   // TODO: Make calculations more efficient by using give_log
   if (give_log) return log(p);
   else return p;
-}
-
-double DWiener::sign(double v) const 
-{
-  if (v == 0) return 0;
-  else if (v>0) return 1;
-  else if (v<0) return -1;
 }
 
 double DWiener::F_lower(double q, double v, double a, double w) const
@@ -621,4 +615,5 @@ double DWiener::r_rejection_based_2(double a, double ter, double z, double v, RN
   } /*end while (!finish) */
 }
 
-}
+} //namespace wiener
+} //namespace jags

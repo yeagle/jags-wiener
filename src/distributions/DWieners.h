@@ -3,6 +3,7 @@
 
 #include "DWiener.h"
 
+namespace jags {
 namespace wiener {
 
 /*
@@ -40,6 +41,7 @@ class DWieners : public DWiener
     double r(std::vector<double const *> const &parameters, RNG *rng) const;
 };
 
-}
+} //namespace wiener
+} //namespace jags
 
 #endif /* DWIENERS_H_ */
