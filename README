@@ -123,8 +123,9 @@ Windows
 #   JAGS Version on your system. In that case, also don't forget to untick
 #   the  "Check for updated files on the TDM-GCC server" 
 #   during the installation proccess of tdm-gcc. 
-#   For Jags-3.3.0 and Jags-3.4.0 use: 
-#   tdm64-gcc-4.6.1.exe
+#   For Jags-4.0.0 use: 
+#   tdm64-gcc-4.6.3.exe
+#   (tdm64-gcc-4.6.1.exe works as well)
 #
 # - Delete all *.dll.a files int the TDM-GCC Installation, so the
 #   compiler will link to the static libraries.
@@ -143,21 +144,20 @@ Windows
 
 # - For building 32bit binaries
 CXX="g++ -m32" \
-./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.4.0/i386/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.4.0/include"
+./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.0.0/i386/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.0.0/include"
 
-make win32
+make win32-install
 
 # - For building 64bit binaries
 CXX="g++ -m64" \
-./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-3.4.0/x64/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-3.4.0/include"
+./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.0.0/x64/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.0.0/include" 
+make win64-install
 
-make win64
-
-# - Copy the win/win32/amoroso.* or win/win64/amoroso.* 
+# - Copy the win/inst32/.../wiener.* or win/inst64/.../wiener.* 
 #   files to your JAGS modules directory to enable the module.
-#   For JAGS-3.4.0 this usually is: 
-#   x64: C:\Program Files\JAGS\JAGS-3.4.0\x64\modules
-#   x32: C:\Program Files\JAGS\JAGS-3.4.0\x32\modules
+#   For JAGS-4.0.0 this usually is: 
+#   x64: C:\Program Files\JAGS\JAGS-4.0.0\x64\modules
+#   x32: C:\Program Files\JAGS\JAGS-4.0.0\x32\modules
 
 # + Note: If you compile both 32bit and 64bit don't forget to
 make clean
