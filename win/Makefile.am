@@ -1,4 +1,4 @@
-EXTRA_DIST=jags.nsi AdvUninstLog.nsh MultiUser64.nsh README.WIN
+EXTRA_DIST=jags.nsi AdvUninstLog.nsh MultiUser64.nsh
 
 clean-local:
 	rm -rf inst 
