@@ -209,8 +209,8 @@ Windows Compiling
 - Copy the win/win32/wiener.* or win/win64/wiener.* 
   files to your JAGS modules directory to enable the module.
   For JAGS-4.2.0 this usually is: 
-  x64: C:\Program Files\JAGS\JAGS-4.2.0\x64\modules
-  x32: C:\Program Files\JAGS\JAGS-4.2.0\x32\modules
+  x64: C:\\Program Files\\JAGS\\JAGS-4.2.0\\x64\\modules
+  x32: C:\\Program Files\\JAGS\\JAGS-4.2.0\\x32\\modules
 
 - *Note*: If you compile both 32bit and 64bit don't forget to make clean
   between the building.
