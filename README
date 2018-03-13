@@ -50,8 +50,8 @@ has been updated to work with JAGS 4.2.0.
 Known Issues
 ------------
 * Loading of the JAGS Wiener Module does not work (so far reported only by mac users).
-
   4 reasons for this issue are possible:
+
   - In MAC OS X the Versions of JAGS and the JAGS Wiener Module have been
     compiled for different MAC Versions (e.g. Leopard and Mavericks)
   - File permissions of the library files are wrong.
@@ -60,7 +60,7 @@ Known Issues
   - The library files have been compiled with a different gcc version than
     the JAGS installation.
   
-  The easiest way to solve this issue, is by removing both, the JAGS and
+* The easiest way to solve this issue, is by removing both, the JAGS and
   JAGS Wiener Module installation. Afterwards, recompile and install first JAGS,
   then the JAGS Wiener Module. If the same gcc version and the same
   installation procedure have been used, it should work.
