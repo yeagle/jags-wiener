@@ -8,7 +8,7 @@
 
 ;JAGS Variables
 !define J_PUBLISHER "JAGS"
-!define JAGS_KEYNAME "JAGS-4.0.0"
+!define JAGS_KEYNAME "JAGS-4.3.1"
 
 !define MULTIUSER_MUI
 !define MULTIUSER_EXECUTIONLEVEL Highest
@@ -73,20 +73,6 @@ Section #Default section
 
 SectionEnd
 
-Section "32-bit installation" Sec32
-
-   SetOutPath "$INSTDIR\i386\modules"
-   !insertmacro UNINSTALL.LOG_OPEN_INSTALL
-   File /r inst32\lib\JAGS\modules-${MAJOR}\wiener*
-   !insertmacro UNINSTALL.LOG_CLOSE_INSTALL
-
-   Push @JAGS_HOME@               #text to be replaced
-   Push $INSTDIR\i386             #replace with
-   Push all                       #replace all occurrences
-   Push all                       #replace all occurrences
-
-SectionEnd #32-bit installation
-
 Section "64-bit installation" Sec64
 
    SetOutPath "$INSTDIR\x64\modules"
@@ -102,7 +88,6 @@ Section "64-bit installation" Sec64
 SectionEnd #64-bit installation
 
 !insertmacro MUI_FUNCTION_DESCRIPTION_BEGIN
-  !insertmacro MUI_DESCRIPTION_TEXT ${Sec32} "Files for 32-bit Windows"
   !insertmacro MUI_DESCRIPTION_TEXT ${Sec64} "Files for 64-bit Windows"
 !insertmacro MUI_FUNCTION_DESCRIPTION_END
 
@@ -113,19 +98,12 @@ Function .onInit
       ;Nothing to do
    ${Else}
       ; Deselect and hide 64-bit section
-      Push $0
-      SectionGetFlags ${Sec64} $0
-      IntOp $0 $0 & ${SECTION_OFF}
-      SectionSetFlags ${Sec64} $0
-      SectionSetText  ${Sec64} ""
-      Pop $0
-      ; Enforce 32-bit selection
       Push $1
-      SectionGetFlags ${Sec32} $1
-#      IntOp $1 $1 & ${SF_SELECTED}
+      SectionGetFlags ${Sec64} $1
+      SectionSetFlags ${Sec64} $1
+      SectionSetText  ${Sec64} ""
       IntOp $1 $1 | ${SF_RO}
-      SectionSetFlags ${Sec32} $1
-      Pop $1
+      Pop $0
    ${EndIf}
 FunctionEnd
 
@@ -137,7 +115,6 @@ FunctionEnd
 Section "Uninstall"
 
    ;uninstall from path, must be repeated for every install logged path individually
-   !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR\i386\modules"
    !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR\x64\modules"
    !insertmacro UNINSTALL.LOG_UNINSTALL "$INSTDIR"
    !insertmacro UNINSTALL.LOG_END_UNINSTALL

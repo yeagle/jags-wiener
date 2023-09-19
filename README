@@ -149,83 +149,40 @@ Windows Compiling
 
 **Second, in Windows:**
 
-- Install MinGW (MinGW installer including msys):
-  http://www.mingw.org
-  In MinGW get installer: msys-base is all you need.
-
-- Install TDM-GCC Compiler Suite:
-  http://tdm-gcc.tdragon.net 
-  Use the exact same version of tdm-gcc as has been used to compile your
-  JAGS Version on your system. In that case, also don't forget to untick
-  the  "Check for updated files on the TDM-GCC server" 
-  during the installation proccess of tdm-gcc. 
-  For Jags-4.0.0 and Jags-4.1.0 use: 
-  tdm64-gcc-4.6.1.exe
-  For Jags-4.2.0 use: 
-  tdm64-gcc-4.9.2-3.exe
-  
-- Delete all *.dll.a files int the TDM-GCC Installation, so the
-  compiler will link to the static libraries.
-
-- Change path in c:/mingw/msys/1.0/etc/fstab from
-  this:     c:/mingw /mingw
-  to:       c:/MinGW64 /mingw
-  to use TDM-GCC compilers
-
-- Alternatively to TDM-GCC, you could also use Rtools
+- Use Rtools
   (https://cran.r-project.org/bin/windows/Rtools/).
-  For Jags-4.2.0 use:
-  Rtools33.exe
+  For Jags-4.2.0 use: Rtools33.exe
+  For Jags-4.3.1 use: Rtools42.exe
 
-  Change path in c:/mingw/msys/1.0/etc/fstab
-  to:       C:/Rtools/mingw_64 /mingw
-  to use Rtools compilers
-
-- --> Start msys, extract tarball in your home dir, 
-      cd into dir and do the following:
-
-- *Note*: the module needs the JAGS include files and
-  the JAGS libraries.
-  Therefore use the -L and -I options, as shown below.
-
-- For building 32bit binaries:
+- Start mingw included in Rtools, extract tarball in your home dir, cd into dir and do the following:
 
 .. code:: sh
 
-  CXX="g++ -m32" \
-  ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.2.0/i386/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.2.0/include"
+  export PATH=/x86_64-w64-mingw32.static.posix/bin:$PATH
 
-  make win32-install
-
-- For building 64bit binaries:
-
-.. code:: sh
-
-  CXX="g++ -m64" \
-  ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.2.0/x64/bin" CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.2.0/include"
-
+  ./configure --host=x86_64-w64-mingw32.static.posix \
+  LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.3.1/x64/bin" \
+  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.3.1/include" 
   make win64-install
 
-- Copy the win/win32/wiener.* or win/win64/wiener.* 
+- Copy the win/win64/wiener.* 
   files to your JAGS modules directory to enable the module.
-  For JAGS-4.2.0 this usually is: 
-  x64: C:\\Program Files\\JAGS\\JAGS-4.2.0\\x64\\modules
-  x32: C:\\Program Files\\JAGS\\JAGS-4.2.0\\x32\\modules
-
-- *Note*: If you compile both 32bit and 64bit don't forget to make clean
-  between the building.
+  For JAGS-4.3.1 this usually is: 
+  x64: C:\\Program Files\\JAGS\\JAGS-4.3.1\\x64\\modules
 
 - *All Windows commands in one* (for copy paste convenience)
 
 .. code:: sh
 
-  CXX="g++ -m32" \
-  ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.2.0/i386/bin" \
-  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.2.0/include" && \
-  make win32-install && \
-  make clean && \
-  CXX="g++ -m64" \
-  ./configure LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.2.0/x64/bin" \
-  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.2.0/include" &&
+  ./configure --host=x86_64-w64-mingw32.static.posix \
+  LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.3.1/x64/bin" \
+  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.3.1/include" && \
   make win64-install && \
   make clean
+
+- For the installer install NSIS 3.09 and do the following:
+
+.. code:: sh
+
+  PATH=$PATH:/c/Program\ Files\ \(x86\)/NSIS
+  make installer
