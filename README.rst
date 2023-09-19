@@ -170,19 +170,23 @@ Windows Compiling
   For JAGS-4.3.1 this usually is: 
   x64: C:\\Program Files\\JAGS\\JAGS-4.3.1\\x64\\modules
 
-- *All Windows commands in one* (for copy paste convenience)
-
-.. code:: sh
-
-  ./configure --host=x86_64-w64-mingw32.static.posix \
-  LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.3.1/x64/bin" \
-  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.3.1/include" && \
-  make win64-install && \
-  make clean
 
 - For the installer install NSIS 3.09 and do the following:
 
 .. code:: sh
 
-  PATH=$PATH:/c/Program\ Files\ \(x86\)/NSIS
+  export PATH=$PATH:/c/Program\ Files\ \(x86\)/NSIS
   make installer
+
+- *All Windows commands in one* (for copy paste convenience)
+
+.. code:: sh
+
+  export PATH=/x86_64-w64-mingw32.static.posix/bin:$PATH
+  export PATH=$PATH:/c/Program\ Files\ \(x86\)/NSIS
+  ./configure --host=x86_64-w64-mingw32.static.posix \
+  LDFLAGS="-L/c/Progra~1/JAGS/JAGS-4.3.1/x64/bin" \
+  CXXFLAGS="-I/c/Progra~1/JAGS/JAGS-4.3.1/include" && \
+  make win64-install && \
+  make installer && \
+  make clean
