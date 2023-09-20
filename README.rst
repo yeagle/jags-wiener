@@ -40,12 +40,12 @@ Copyright (C) 2012 Dominik Wabersich <dominik.wabersich@gmail.com>
 and Joachim Vandekerckhove <joachim@uci.edu>
 
 When using this module, please cite as: 
-    Wabersich, D. and Vandekerckhove, J. (in preparation). Extending JAGS: 
+    Wabersich, D. and Vandekerckhove, J. (2014). Extending JAGS: 
     A tutorial on adding custom distributions to JAGS (with a diffusion
     model example)
 
 Also note, that the tutorial was written for JAGS 3.3.0. The module code
-has been updated to work with JAGS 4.2.0.
+has been updated to work with JAGS 4.2.0 and JAGS 4.3.1.
 
 Known Issues
 ------------
