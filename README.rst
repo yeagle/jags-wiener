@@ -101,6 +101,12 @@ where JAGS is copied (i.e. installed), for example:
 
   ./configure --prefix /usr && make && sudo make install
 
+Mac
+"""
+See additional instructions here: 
+
+https://github.com/kiante-fernandez/Rhddmjags/blob/main/jags_wiener_install.md
+
 Windows
 """""""
 For Windows we provide precompiled binaries, which come with an
